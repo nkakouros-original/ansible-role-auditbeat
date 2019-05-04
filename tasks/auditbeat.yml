@@ -1,0 +1,9 @@
+---
+
+- include_tasks: assertions.yml
+
+- include_tasks: "{{ ansible_os_family }}/install.yml"
+
+- include_tasks: configure.yml
+
+- include_tasks: service.yml

@@ -1,0 +1,15 @@
+---
+
+# Set to false to completely disable the role
+auditbeat_enabled: true
+
+# The version of auditbeat to use, eg 6, 7, etc. This is only used when
+# `auditbeat_use_upstream_repo` is set to `true`
+auditbeat_major_version: 7
+
+# Whether to install auditbeat from the upstream repo, instead of the system
+# provided version.
+auditbeat_use_upstream_repo: true
+
+# The auditbeat configuration
+auditbeat_config: {}

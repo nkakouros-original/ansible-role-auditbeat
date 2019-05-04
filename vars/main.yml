@@ -1,0 +1,38 @@
+---
+
+# Default config coming with auditbeat 7.0
+_auditbeat_config:
+  auditbeat:
+    modules:
+      - module: auditd
+        audit_rule_files: ['${path.config}/audit.rules.d/*.conf']
+      - module: file_integrity
+        paths:
+          - /bin
+          - /usr/bin
+          - /sbin
+          - /usr/sbin
+          - /etc
+      - module: system
+        datasets:
+          - host
+          - login
+          - package
+          - process
+          - socket
+          - user
+        state.period: 12h
+        user.detect_password_changes: true
+        login.wtmp_file_pattern: /var/log/wtmp*
+        login.btmp_file_pattern: /var/log/btmp*
+  setup:
+    template:
+      settings:
+        index:
+          number_of_shards: 1
+  output:
+    elasticsearch:
+      hosts: ["localhost:9200"]
+  processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~

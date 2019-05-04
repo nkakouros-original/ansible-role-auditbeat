@@ -1,0 +1,23 @@
+---
+
+- name: Install https apt transport
+  apt:
+    name: apt-transport-https
+  when: auditbeat_use_upstream_repo | bool
+
+- name: Add upstream repo key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    id: 46095ACC8548582C1A2699A9D27D666CD88E42B4
+  when: auditbeat_use_upstream_repo | bool
+
+- name: Add upstream auditbeat repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/{{
+            auditbeat_major_version }}.x/apt stable main"
+  when: auditbeat_use_upstream_repo | bool
+
+- name: Install auditbeat
+  apt:
+    name: auditbeat
+    update_cache: true
