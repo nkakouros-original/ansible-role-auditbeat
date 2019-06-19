@@ -14,6 +14,10 @@ platforms:
     command: ${MOLECULE_INIT_CMD-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    pid: host
+    capabilities:
+      - AUDIT_CONTROL
+      - AUDIT_READ
     privileged: true
     pre_build_image: true
 provisioner:

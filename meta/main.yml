@@ -9,7 +9,6 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - trust
         - xenial
         - bionic
   galaxy_tags:

@@ -1,0 +1,73 @@
+---
+
+- name: Create kibana  certificates folder
+  file:
+    path: "{{ auditbeat_certificates_dir }}/kibana"
+    state: directory
+    owner: root
+    group: root
+    mode: 0o755
+
+- name: Upload certificates
+  copy:
+    src: "{{ item }}"
+    dest: "{{ auditbeat_certificates_dir }}/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: 0o644
+  when:
+    - item != None
+  loop:
+    - "{{ auditbeat_kibana_ssl_ca }}"
+    - "{{ auditbeat_kibana_ssl_crt }}"
+    - "{{ auditbeat_kibana_ssl_key }}"
+  notify: auditbeat restart service
+
+- name: Add Kibana endpoint to auditbeat configuration
+  set_fact:
+    auditbeat_combined_config: >-
+      {{
+        _auditbeat_kibana_endpoint
+        | combine(_auditbeat_kibana_security, recursive=true)
+        | combine(auditbeat_combined_config, recursive=true)
+      }}
+  vars:
+    _auditbeat_kibana_endpoint:
+      setup:
+        dashboards:
+          enabled: true
+        kibana:
+          host: "{{ auditbeat_kibana_host }}"
+          path: "{{ auditbeat_kibana_path | default('', true) }}"
+    _auditbeat_kibana_security: >-
+      {
+        'setup': {
+          'kibana': {
+            {%- if auditbeat_kibana_username != None -%}
+              'username': '${KIBANA_USER}',
+            {%- endif -%}
+            {%- if auditbeat_kibana_password != None -%}
+              'password': '${KIBANA_PASS}',
+            {%- endif -%}
+            'ssl': {
+              {%- if auditbeat_kibana_ssl_ca != None -%}
+                'certificate_authorities': '{{ auditbeat_certificates_dir
+                            }}/kibana/{{ auditbeat_kibana_ssl_ca | basename }}',
+              {%- endif -%}
+              {%- if auditbeat_kibana_ssl_crt != None -%}
+                'certificate': '{{ auditbeat_certificates_dir }}/kibana/{{
+                                        auditbeat_kibana_ssl_crt | basename }}',
+              {%- endif -%}
+              {%- if auditbeat_kibana_ssl_key != None -%}
+                'key': '{{ auditbeat_certificates_dir }}/kibana/{{
+                                        auditbeat_kibana_ssl_key | basename }}',
+              {%- endif -%}
+              {%- if auditbeat_kibana_ssl_key_passphrase != None -%}
+                'key_passphrase': '${ES_KIBANA_CERT_PASSPHRASE}',
+              {%- endif -%}
+              'enabled': {{
+                          auditbeat_kibana.ssl.enabled | default(false, true) }}
+            }
+          }
+        }
+      }

@@ -12,5 +12,5 @@
 - name: Check that auditbeat service has started successfully
   assert:
     that:
-      'ansible_facts.services["auditbeat.service"]["state"] == running'
+      'ansible_facts.services["auditbeat.service"]["state"] == "running"'
     msg: 'audibeat.service failed to start'

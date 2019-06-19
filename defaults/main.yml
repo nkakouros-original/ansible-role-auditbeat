@@ -23,12 +23,12 @@ auditbeat_certificates_dir: /etc/auditbeat/certs/
 auditbeat_certificates_password: ~
 # The password used to protect the generated private keys. Leave empty if the
 # certificates are not password protected. The password will be available as
-# `${key_passphrase}` to use in `auditbeat_config`.
+# `${OUTPUT_CERT_KEY_PASSPHRASE}` to use in `auditbeat_config`.
 
-auditbeat_certificates_password_renew: false
-# Set to true if you need to update the certificate password. Then, the role
-# will update the password in the keystore. This is false by default to support
-# idempotency.
+auditbeat_keystore_update: false
+# Set to true if you need to update the passwords and certificate passphrases
+# that are stored in the keystore. Set this to true if you changed any password
+# or passphrase.  This is false by default to support idempotency.
 # }}}
 # Configuration {{{
 auditbeat_systemd_override: ~
@@ -53,6 +53,18 @@ auditbeat_enabled_bundled_rules: []
 # ```
 # These files will be uploaded to `auditbeat_rule_dir`.
 
+auditbeat_check_output: false
+# Check if auditbeat can connect successfully to the configured output before
+# starting auditbeat.
+
+auditbeat_output_user: ~
+auditbeat_output_pass: ~
+# Set these variables to the credentials that auditbeat should use to login to
+# the output that you have configured in `auditbeat_config`. These are used by
+# the role to store the output user/pass in the secure keystore. They are not
+# used for any other task. When configuring your output in `auditbeat_config`,
+# you can reference these variables using `${OUTPUT_USER}` and `${OUTPUT_PASS}`.
+
 auditbeat_config: {}
 # The auditbeat configuration. This will be combined with a default
 # configuration that comes with this role. The variables below are used by the
@@ -67,10 +79,6 @@ auditbeat_rule_dir: /etc/auditbeat/audit.rules.d
 # by the role to know where it should upload the files in
 # `auditbeat_enabled_bundled_rules`. This directory will be searched for
 # `*.conf` files.
-
-auditbeat_check_output: false
-# Check if auditbeat can connect successfully to the configured output before
-# starting auditbeat.
 # }}}
 # Other {{{
 auditbeat_extract_index_template: false
@@ -87,4 +95,33 @@ auditbeat_extract_index_template: false
 
 auditbeat_index_template_download_dir: ''
 # Where on the ansible controller the index template should be downloaded to.
-# }}}
+
+auditbeat_install_kibana_dashboards: false
+# Set to true to load the kibana dashboards that come with auditbeat. If you set
+# this variable to true, the variables below will be used. Otherwise, they are
+# ignored.
+
+auditbeat_kibana_host: ~
+# Address where the Kibana endpoint can be reached at.
+auditbeat_kibana_path: ~
+# HTTP path prefix to prepend to http api calls
+
+auditbeat_kibana_username: ~
+auditbeat_kibana_password: ~
+# The user credentials that Auditbeat should use to log into the Kibana
+# endpoint. Leave `None` if no user login is needed.
+
+auditbeat_kibana_ssl_enabled: true
+# Whether to enable ssl when connecting to the Kibana endpoint.
+auditbeat_kibana_ssl_ca: ~
+auditbeat_kibana_ssl_crt: ~
+auditbeat_kibana_ssl_key: ~
+auditbeat_kibana_ssl_key_passphrase: ~
+# The role will by default add to `auditbeat_config` a kibana endpoint
+# configuration based on you settings above.  The certificate files will be
+# uploaded to the auditbeat server at the `{{ auditbeat_certificates_dir }}
+# /kibana` directory. The username, password and key_passphrase will be added to
+# the secure keystore and you can refer to them in you `auditbeat_config` with
+# `${KIBANA_USER}`, `${KIBANA_PASS}` and `${KIBANA_CERT_KEY_PASSPHRASE}`
+# respectively.
+# # }}}

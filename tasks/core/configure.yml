@@ -11,7 +11,7 @@
     owner: root
     group: root
     mode: 0o644
-    validate: auditbeat test config --path.config %s
+    # validate: auditbeat test config --path.config %s
   notify: auditbeat restart service
 
 - name: Create systemd override file

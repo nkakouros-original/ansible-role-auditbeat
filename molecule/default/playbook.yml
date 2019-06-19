@@ -5,3 +5,7 @@
     - role: ansible-role-auditbeat
   vars:
     auditbeat_mask_journald_audit: false
+    auditbeat_config:
+      output:
+        console:
+          pretty: true

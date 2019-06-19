@@ -35,7 +35,7 @@
                                     auditbeat_certificates['crt'] | basename }}"
         key: "{{ auditbeat_certificates_dir }}/{{
                                     auditbeat_certificates['key'] | basename }}"
-        key_passphrase: '"${ES_KEY_PASSPHRASE}"'
+        key_passphrase: '${OUTPUT_CERT_KEY_PASSPHRASE}'
     _auditbeat_output_ssl_config: >-
       {%- set outputs = (auditbeat_combined_config['output'].keys() | list) -%}
       {
