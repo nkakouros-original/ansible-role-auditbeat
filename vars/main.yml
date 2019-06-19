@@ -36,6 +36,3 @@ _auditbeat_default_config:
       settings:
         index:
           number_of_shards: 1
-  processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~

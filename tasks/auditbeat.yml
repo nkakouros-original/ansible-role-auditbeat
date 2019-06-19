@@ -16,6 +16,7 @@
   when: auditbeat_extract_index_template | bool
 
 - include_tasks: outputs/certificates.yml
+  when: auditbeat_certificates != None
 
 - include_tasks: outputs/keystore.yml
   when: auditbeat_certificates_password != None

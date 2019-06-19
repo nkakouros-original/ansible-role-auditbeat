@@ -3,3 +3,5 @@
   hosts: all
   roles:
     - role: ansible-role-auditbeat
+  vars:
+    auditbeat_mask_journald_audit: false
