@@ -1,0 +1,39 @@
+---
+
+- name: Upload configuration
+  copy:
+    content: >-
+      {{
+        auditbeat_combined_config
+        | to_nice_yaml(indent=2, explicit_start=true)
+      }}
+    dest: /etc/auditbeat/auditbeat.yml
+    owner: root
+    group: root
+    mode: 0o644
+    validate: auditbeat test config --path.config %s
+  notify: auditbeat restart service
+
+- name: Create systemd override file
+  copy:
+    content: "{{ auditbeat_systemd_override }}"
+    dest: /etc/systemd/system/auditbeat.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0o644
+  when: auditbeat_systemd_override != None
+  notify: auditbeat restart service
+
+- name: Upload rules bundled with the role
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/auditbeat/{{ auditbeat_rule_dir }}"
+    owner: root
+    group: root
+    mode: 0o644
+  loop: "{{ auditbeat_enabled_bundled_rules }}"
+
+- name: Check that the output can be reached successfully
+  command: auditbeat test output
+  changed_when: false
+  when: auditbeat_check_output | bool

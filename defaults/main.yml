@@ -3,13 +3,88 @@
 # Set to false to completely disable the role
 auditbeat_enabled: true
 
+# Installation {{{
 # The version of auditbeat to use, eg 6, 7, etc. This is only used when
 # `auditbeat_use_upstream_repo` is set to `true`
 auditbeat_major_version: 7
+# }}}
+# Certificates {{{
+auditbeat_certificates: ~
+# Use this variable to point to certificate files on the ansible controller
+# that should be uploaded to the auditbeat server. Eg:
+# auditbeat_certificates:
+#   ca: path/to/ca.cert
+#   cert: path/to/node/cert
+#   key: path/to/node/key
 
-# Whether to install auditbeat from the upstream repo, instead of the system
-# provided version.
-auditbeat_use_upstream_repo: true
+auditbeat_certificates_dir: /etc/auditbeat/certs/
+# The folder where `auditbeat_certificates` will be uploaded into.
 
-# The auditbeat configuration
+auditbeat_certificates_password: ~
+# The password used to protect the generated private keys. Leave empty if the
+# certificates are not password protected. The password will be available as
+# `${key_passphrase}` to use in `auditbeat_config`.
+
+auditbeat_certificates_password_renew: false
+# Set to true if you need to update the certificate password. Then, the role
+# will update the password in the keystore. This is false by default to support
+# idempotency.
+# }}}
+# Configuration {{{
+auditbeat_systemd_override: ~
+# Use this variable to override variables in the default systemd service file
+# for auditbeat. Eg:
+# auditbeat_systemd_override: |
+#   [Service]
+#   Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
+
+auditbeat_mask_journald_audit: true
+# Set this to true to prevent journald from listening for audit messages. This
+# should save on CPU and disk space.
+
+auditbeat_enabled_bundled_rules: []
+# A list of rule files that are bundled with this role and that the role should
+# indeed upload to auditbeat. The list should contain the filenames of the rule
+# files you want to use. For instance, if you find the
+# `files/00-default-rules.conf` rules usefule, set:
+# ```yml
+# auditbeat_enabled_bundled_roles:
+#   - 00-default-rules.conf
+# ```
+# These files will be uploaded to `auditbeat_rule_dir`.
+
 auditbeat_config: {}
+# The auditbeat configuration. This will be combined with a default
+# configuration that comes with this role. The variables below are used by the
+# default configuration and are meant as a convenience. You can ignore them and
+# set the relevant settings in `auditbeat_config` directly.
+
+auditbeat_name: "{{ inventory_hostname }}"
+# The name of the beat.
+
+auditbeat_rule_dir: /etc/auditbeat/audit.rules.d
+# The directory where audit rule files are located. These setting is also used
+# by the role to know where it should upload the files in
+# `auditbeat_enabled_bundled_rules`. This directory will be searched for
+# `*.conf` files.
+
+auditbeat_check_output: false
+# Check if auditbeat can connect successfully to the configured output before
+# starting auditbeat.
+# }}}
+# Other {{{
+auditbeat_extract_index_template: false
+# Whether to extract the default index template that comes with auditbeat. This
+# template is automatically loaded to elasticsearch if the elasticsearch output
+# is configured in the auditbeat configuration. If, however, auditbeat does not
+# communicate directly with auditbeatseach (eg only a `logstash` output has been
+# configured), then the template needs to be manually loaded. Use this variable
+# to extract the index template and download it to the ansible controller so
+# that it can be loaded into elasticsearch manually (or via an `elasticsearch`
+# ansible role, such `nkakouros.elasticsearch`). The extracted index template
+# will be named `auditbeat.7.1.1.template.json`, where `7.1.1` will be the
+# actual installed version of auditbeat.
+
+auditbeat_index_template_download_dir: ''
+# Where on the ansible controller the index template should be downloaded to.
+# }}}

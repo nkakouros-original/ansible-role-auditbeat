@@ -1,0 +1,9 @@
+---
+
+- name: Disable journald-audit
+  systemd:
+    name: systemd-journald-audit.socket
+    masked: true
+    enabled: false
+    state: stopped
+  when: auditbeat_mask_journald_audit | bool

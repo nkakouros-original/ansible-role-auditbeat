@@ -1,7 +1,0 @@
----
-
-- name: Enable systemd service
-  systemd:
-    name: auditbeat
-    state: started
-    enabled: true

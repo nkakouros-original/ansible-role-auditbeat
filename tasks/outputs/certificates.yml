@@ -1,0 +1,48 @@
+---
+
+- name: Create certificates folder
+  file:
+    path: "{{ auditbeat_certificates_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0o755
+
+- name: Upload certificates
+  copy:
+    src: "{{ item.value }}"
+    dest: "{{ auditbeat_certificates_dir }}/{{ item.value | basename }}"
+    owner: root
+    group: root
+    mode: 0o644
+  loop: "{{ auditbeat_certificates| dict2items }}"
+  notify: auditbeat restart service
+
+- name: Add certificates configuration
+  set_fact:
+    auditbeat_combined_config: >-
+      {{
+        _auditbeat_output_ssl_config
+        | combine(auditbeat_combined_config, recursive=true)
+      }}
+  vars:
+    _auditbeat_ssl_config:
+      ssl:
+        enabled: true
+        certificate_authorities: "{{ auditbeat_certificates_dir }}/{{
+                                    auditbeat_certificates['ca'] | basename }}"
+        certificate: "{{ auditbeat_certificates_dir }}/{{
+                                    auditbeat_certificates['crt'] | basename }}"
+        key: "{{ auditbeat_certificates_dir }}/{{
+                                    auditbeat_certificates['key'] | basename }}"
+        key_passphrase: '"${ES_KEY_PASSPHRASE}"'
+    _auditbeat_output_ssl_config: >-
+      {%- set outputs = (auditbeat_combined_config['output'].keys() | list) -%}
+      {
+        {# only one output should be present #}
+        {%- for output in outputs -%}
+          'output': {
+            '{{ output }}': {{ _auditbeat_ssl_config }}
+          }
+        {%- endfor -%}
+      }

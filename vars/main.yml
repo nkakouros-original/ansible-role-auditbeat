@@ -1,11 +1,13 @@
 ---
 
 # Default config coming with auditbeat 7.0
-_auditbeat_config:
+_auditbeat_default_config:
+  name: "{{ auditbeat_name }}"
   auditbeat:
     modules:
       - module: auditd
-        audit_rule_files: ['${path.config}/audit.rules.d/*.conf']
+        audit_rule_files:
+          - "{{ auditbeat_rule_dir }}/*.conf"
       - module: file_integrity
         paths:
           - /bin
@@ -18,21 +20,22 @@ _auditbeat_config:
           - host
           - login
           - package
-          - process
-          - socket
           - user
-        state.period: 12h
-        user.detect_password_changes: true
+        period: 1m
+        user:
+          detect_password_changes: true
         login.wtmp_file_pattern: /var/log/wtmp*
         login.btmp_file_pattern: /var/log/btmp*
+      - module: system
+        datasets:
+          - process
+          - socket
+        period: 1s
   setup:
     template:
       settings:
         index:
           number_of_shards: 1
-  output:
-    elasticsearch:
-      hosts: ["localhost:9200"]
   processors:
     - add_host_metadata: ~
     - add_cloud_metadata: ~

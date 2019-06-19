@@ -1,0 +1,14 @@
+---
+
+- name: Get auditbeat version
+  command: auditbeat version
+  changed_when: false
+  register: auditbeat_full_version
+
+- name: Register auditbeat version
+  set_fact:
+    auditbeat_full_version: >-
+      {{
+        auditbeat_full_version.stdout
+        | regex_replace('^auditbeat version ([0-9]+\.[0-9]+\.[0-9]) .*$', '\1')
+      }}

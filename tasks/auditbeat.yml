@@ -2,8 +2,26 @@
 
 - include_tasks: assertions.yml
 
-- include_tasks: "{{ ansible_os_family }}/install.yml"
+- include_tasks: variables.yml
 
-- include_tasks: configure.yml
+- include_tasks: core/system.yml
 
-- include_tasks: service.yml
+- include_tasks: "core/install/{{ ansible_os_family }}.yml"
+
+- include_tasks: core/version.yml
+
+- include_tasks: core/keystore.yml
+
+- include_tasks: outputs/index.yml
+  when: auditbeat_extract_index_template | bool
+
+- include_tasks: outputs/certificates.yml
+
+- include_tasks: outputs/keystore.yml
+  when: auditbeat_certificates_password != None
+
+- include_tasks: core/configure.yml
+
+- meta: flush_handlers
+
+- include_tasks: core/service.yml

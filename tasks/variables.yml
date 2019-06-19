@@ -1,0 +1,9 @@
+---
+
+- name: Merge user conf with defaults
+  set_fact:
+    auditbeat_combined_config: >-
+      {{
+        _auditbeat_default_config
+        | combine(auditbeat_config, recursive=True)
+      }}
