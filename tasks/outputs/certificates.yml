@@ -13,8 +13,7 @@
     src: "{{ item.value }}"
     dest: "{{ auditbeat_certificates_dir }}/{{ item.value | basename }}"
     owner: root
-    group: root
-    mode: 0o644
+    mode: "{{ '0o400' if item.key == 'key' else '0o644' }}"
   loop: "{{ auditbeat_certificates| dict2items }}"
   notify: auditbeat restart service
 
@@ -29,6 +28,7 @@
     _auditbeat_ssl_config:
       ssl:
         enabled: true
+        verification_mode: full
         certificate_authorities: "{{ auditbeat_certificates_dir }}/{{
                                     auditbeat_certificates['ca'] | basename }}"
         certificate: "{{ auditbeat_certificates_dir }}/{{

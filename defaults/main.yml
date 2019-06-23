@@ -11,7 +11,9 @@ auditbeat_major_version: 7
 # Certificates {{{
 auditbeat_certificates: ~
 # Use this variable to point to certificate files on the ansible controller
-# that should be uploaded to the auditbeat server. Eg:
+# that should be uploaded to the auditbeat server. This variable will also be
+# used to constuct the relevant section in the output configuration of
+# auditbeat.  The format of this variable is as follows:
 # auditbeat_certificates:
 #   ca: path/to/ca.cert
 #   cert: path/to/node/cert
