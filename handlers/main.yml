@@ -2,18 +2,18 @@
 
 - name: Restart systemd service
   systemd:
-    name: auditbeat
+    name: "{{ beats_flavor }}"
     state: restarted
     daemon_reload: true
-  listen: auditbeat restart service
+  listen: beats restart service
 
 - name: Get service facts
   service_facts: ~
-  listen: auditbeat restart service
+  listen: beats restart service
 
-- name: Check that auditbeat service has started successfully
+- name: Check that beats service has started successfully
   assert:
     that:
-      'ansible_facts.services["auditbeat.service"]["state"] == "running"'
-    msg: 'audibeat.service failed to start'
-  listen: auditbeat restart service
+      "ansible_facts.services['{{ beats_flavor }}.service']['state'] == 'running'"
+    msg: "{{ beats_flavor }}.service failed to start"
+  listen: beats restart service

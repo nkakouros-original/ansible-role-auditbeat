@@ -1,129 +1,134 @@
 ---
 
 # Set to false to completely disable the role
-auditbeat_enabled: true
+beats_enabled: true
+
+beats_flavor: auditbeat
+# Set this variable to the name of the beat that you want the role to install
+# and configure.
 
 # Installation {{{
-# The version of auditbeat to use, eg 6, 7, etc. This is only used when
-# `auditbeat_use_upstream_repo` is set to `true`
-auditbeat_major_version: 7
+# The version of beats to use, eg 6, 7, etc. This is only used when
+# `beats_use_upstream_repo` is set to `true`
+beats_major_version: 7
 # }}}
 # Certificates {{{
-auditbeat_certificates: ~
+beats_certificates: ~
 # Use this variable to point to certificate files on the ansible controller
-# that should be uploaded to the auditbeat server. This variable will also be
+# that should be uploaded to the beats server. This variable will also be
 # used to constuct the relevant section in the output configuration of
-# auditbeat.  The format of this variable is as follows:
-# auditbeat_certificates:
+# beats.  The format of this variable is as follows:
+# beats_certificates:
 #   ca: path/to/ca.cert
 #   cert: path/to/node/cert
 #   key: path/to/node/key
 
-auditbeat_certificates_dir: /etc/auditbeat/certs/
-# The folder where `auditbeat_certificates` will be uploaded into.
+beats_certificates_dir: /etc/auditbeat/certs/
+# The folder where `beats_certificates` will be uploaded into.
 
-auditbeat_certificates_password: ~
+beats_certificates_password: ~
 # The password used to protect the generated private keys. Leave empty if the
 # certificates are not password protected. The password will be available as
-# `${OUTPUT_CERT_KEY_PASSPHRASE}` to use in `auditbeat_config`.
+# `${OUTPUT_CERT_KEY_PASSPHRASE}` to use in `beats_config`.
 
-auditbeat_keystore_update: false
+beats_keystore_update: false
 # Set to true if you need to update the passwords and certificate passphrases
 # that are stored in the keystore. Set this to true if you changed any password
 # or passphrase.  This is false by default to support idempotency.
 # }}}
 # Configuration {{{
-auditbeat_systemd_override: ~
+beats_systemd_override: ~
 # Use this variable to override variables in the default systemd service file
-# for auditbeat. Eg:
-# auditbeat_systemd_override: |
+# for beats. Eg:
+# beats_systemd_override: |
 #   [Service]
 #   Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
 
-auditbeat_mask_journald_audit: true
+beats_mask_journald_audit: true
 # Set this to true to prevent journald from listening for audit messages. This
 # should save on CPU and disk space.
 
-auditbeat_enabled_bundled_rules: []
-# A list of rule files that are bundled with this role and that the role should
-# indeed upload to auditbeat. The list should contain the filenames of the rule
-# files you want to use. For instance, if you find the
-# `files/00-default-rules.conf` rules usefule, set:
-# ```yml
-# auditbeat_enabled_bundled_roles:
-#   - 00-default-rules.conf
-# ```
-# These files will be uploaded to `auditbeat_rule_dir`.
+beats_check_output: false
+# Check if beats can connect successfully to the configured output before
+# starting beats.
 
-auditbeat_check_output: false
-# Check if auditbeat can connect successfully to the configured output before
-# starting auditbeat.
-
-auditbeat_output_user: ~
-auditbeat_output_pass: ~
-# Set these variables to the credentials that auditbeat should use to login to
-# the output that you have configured in `auditbeat_config`. These are used by
+beats_output_user: ~
+beats_output_pass: ~
+# Set these variables to the credentials that beats should use to login to
+# the output that you have configured in `beats_config`. These are used by
 # the role to store the output user/pass in the secure keystore. They are not
-# used for any other task. When configuring your output in `auditbeat_config`,
+# used for any other task. When configuring your output in `beats_config`,
 # you can reference these variables using `${OUTPUT_USER}` and `${OUTPUT_PASS}`.
 
-auditbeat_config: {}
-# The auditbeat configuration. This will be combined with a default
+beats_config: {}
+# The beats configuration. This will be combined with a default
 # configuration that comes with this role. The variables below are used by the
 # default configuration and are meant as a convenience. You can ignore them and
-# set the relevant settings in `auditbeat_config` directly.
+# set the relevant settings in `beats_config` directly.
 
-auditbeat_name: "{{ inventory_hostname }}"
+beats_name: "{{ inventory_hostname }}"
 # The name of the beat.
-
-auditbeat_rule_dir: /etc/auditbeat/audit.rules.d
-# The directory where audit rule files are located. These setting is also used
-# by the role to know where it should upload the files in
-# `auditbeat_enabled_bundled_rules`. This directory will be searched for
-# `*.conf` files.
 # }}}
 # Other {{{
-auditbeat_extract_index_template: false
-# Whether to extract the default index template that comes with auditbeat. This
+beats_extract_index_template: false
+# Whether to extract the default index template that comes with beats. This
 # template is automatically loaded to elasticsearch if the elasticsearch output
-# is configured in the auditbeat configuration. If, however, auditbeat does not
-# communicate directly with auditbeatseach (eg only a `logstash` output has been
+# is configured in the beats configuration. If, however, beats does not
+# communicate directly with elasticseach (eg only a `logstash` output has been
 # configured), then the template needs to be manually loaded. Use this variable
 # to extract the index template and download it to the ansible controller so
 # that it can be loaded into elasticsearch manually (or via an `elasticsearch`
 # ansible role, such `nkakouros.elasticsearch`). The extracted index template
-# will be named `auditbeat.7.1.1.template.json`, where `7.1.1` will be the
-# actual installed version of auditbeat.
+# will be named `beats.7.1.1.template.json`, where `7.1.1` will be the
+# actual installed version of beats.
 
-auditbeat_index_template_download_dir: ''
+beats_index_template_download_dir: ''
 # Where on the ansible controller the index template should be downloaded to.
 
-auditbeat_install_kibana_dashboards: false
-# Set to true to load the kibana dashboards that come with auditbeat. If you set
+beats_install_kibana_dashboards: false
+# Set to true to load the kibana dashboards that come with beats. If you set
 # this variable to true, the variables below will be used. Otherwise, they are
 # ignored.
 
-auditbeat_kibana_host: ~
+beats_kibana_host: ~
 # Address where the Kibana endpoint can be reached at.
-auditbeat_kibana_path: ~
+beats_kibana_path: ~
 # HTTP path prefix to prepend to http api calls
 
-auditbeat_kibana_username: ~
-auditbeat_kibana_password: ~
-# The user credentials that Auditbeat should use to log into the Kibana
+beats_kibana_username: ~
+beats_kibana_password: ~
+# The user credentials that beats should use to log into the Kibana
 # endpoint. Leave `None` if no user login is needed.
 
-auditbeat_kibana_ssl_enabled: true
+beats_kibana_ssl_enabled: true
 # Whether to enable ssl when connecting to the Kibana endpoint.
-auditbeat_kibana_ssl_ca: ~
-auditbeat_kibana_ssl_crt: ~
-auditbeat_kibana_ssl_key: ~
-auditbeat_kibana_ssl_key_passphrase: ~
-# The role will by default add to `auditbeat_config` a kibana endpoint
+beats_kibana_ssl_ca: ~
+beats_kibana_ssl_crt: ~
+beats_kibana_ssl_key: ~
+beats_kibana_ssl_key_passphrase: ~
+# The role will by default add to `beats_config` a kibana endpoint
 # configuration based on you settings above.  The certificate files will be
-# uploaded to the auditbeat server at the `{{ auditbeat_certificates_dir }}
+# uploaded to the beats server at the `{{ beats_certificates_dir }}
 # /kibana` directory. The username, password and key_passphrase will be added to
-# the secure keystore and you can refer to them in you `auditbeat_config` with
+# the secure keystore and you can refer to them in you `beats_config` with
 # `${KIBANA_USER}`, `${KIBANA_PASS}` and `${KIBANA_CERT_KEY_PASSPHRASE}`
 # respectively.
 # # }}}
+# Auditbeat specifics {{{
+beats_enabled_bundled_rules: []
+# A list of rule files that are bundled with this role and that the role should
+# indeed upload to beats. The list should contain the filenames of the rule
+# files you want to use. For instance, if you find the
+# `files/00-default-rules.conf` rules useful, set:
+# ```yml
+# beats_enabled_bundled_roles:
+#   - 00-default-rules.conf
+# ```
+# These files will be uploaded to `beats_rule_dir`.
+
+beats_rule_dir: /etc/beats/audit.rules.d
+# The directory where audit rule files are located. These setting is also used
+# by the role to know where it should upload the files in
+# `beats_enabled_bundled_rules`. This directory will be searched for
+# `*.conf` files.
+# }}}

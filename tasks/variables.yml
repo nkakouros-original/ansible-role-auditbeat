@@ -1,9 +1,11 @@
 ---
 
+- include_vars: "{{ beats_flavor }}.yml"
+
 - name: Merge user conf with defaults
   set_fact:
-    auditbeat_combined_config: >-
+    beats_combined_config: >-
       {{
-        _auditbeat_default_config
-        | combine(auditbeat_config, recursive=True)
+        _beats_default_config
+        | combine(beats_config, recursive=True)
       }}

@@ -2,7 +2,7 @@
 
 - name: Create certificates folder
   file:
-    path: "{{ auditbeat_certificates_dir }}"
+    path: "{{ beats_certificates_dir }}"
     state: directory
     owner: root
     group: root
@@ -11,38 +11,38 @@
 - name: Upload certificates
   copy:
     src: "{{ item.value }}"
-    dest: "{{ auditbeat_certificates_dir }}/{{ item.value | basename }}"
+    dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
     owner: root
     mode: "{{ '0o400' if item.key == 'key' else '0o644' }}"
-  loop: "{{ auditbeat_certificates| dict2items }}"
-  notify: auditbeat restart service
+  loop: "{{ beats_certificates| dict2items }}"
+  notify: beats restart service
 
 - name: Add certificates configuration
   set_fact:
-    auditbeat_combined_config: >-
+    beats_combined_config: >-
       {{
-        _auditbeat_output_ssl_config
-        | combine(auditbeat_combined_config, recursive=true)
+        _beats_output_ssl_config
+        | combine(beats_combined_config, recursive=true)
       }}
   vars:
-    _auditbeat_ssl_config:
+    _beats_ssl_config:
       ssl:
         enabled: true
         verification_mode: full
-        certificate_authorities: "{{ auditbeat_certificates_dir }}/{{
-                                    auditbeat_certificates['ca'] | basename }}"
-        certificate: "{{ auditbeat_certificates_dir }}/{{
-                                    auditbeat_certificates['crt'] | basename }}"
-        key: "{{ auditbeat_certificates_dir }}/{{
-                                    auditbeat_certificates['key'] | basename }}"
+        certificate_authorities: "{{ beats_certificates_dir }}/{{
+                                    beats_certificates['ca'] | basename }}"
+        certificate: "{{ beats_certificates_dir }}/{{
+                                    beats_certificates['crt'] | basename }}"
+        key: "{{ beats_certificates_dir }}/{{
+                                    beats_certificates['key'] | basename }}"
         key_passphrase: '${OUTPUT_CERT_KEY_PASSPHRASE}'
-    _auditbeat_output_ssl_config: >-
-      {%- set outputs = (auditbeat_combined_config['output'].keys() | list) -%}
+    _beats_output_ssl_config: >-
+      {%- set outputs = (beats_combined_config['output'].keys() | list) -%}
       {
         {# only one output should be present #}
         {%- for output in outputs -%}
           'output': {
-            '{{ output }}': {{ _auditbeat_ssl_config }}
+            '{{ output }}': {{ _beats_ssl_config }}
           }
         {%- endfor -%}
       }

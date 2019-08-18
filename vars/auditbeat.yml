@@ -1,13 +1,13 @@
 ---
 
 # Default config coming with auditbeat 7.0
-_auditbeat_default_config:
-  name: "{{ auditbeat_name }}"
+_beats_default_config:
+  name: "{{ beats_name }}"
   auditbeat:
     modules:
       - module: auditd
         audit_rule_files:
-          - "{{ auditbeat_rule_dir }}/*.conf"
+          - "{{ beats_rule_dir }}/*.conf"
       - module: file_integrity
         paths:
           - /bin

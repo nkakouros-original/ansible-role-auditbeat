@@ -2,10 +2,10 @@
 - name: Converge
   hosts: all
   roles:
-    - role: ansible-role-auditbeat
+    - role: ansible-role-beats
   vars:
-    auditbeat_mask_journald_audit: false
-    auditbeat_config:
+    beats_mask_journald_audit: false
+    beats_config:
       output:
         console:
           pretty: true

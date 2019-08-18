@@ -1,14 +1,14 @@
 ---
 
-- name: Get auditbeat version
-  command: auditbeat version
+- name: Get "{{ beats_flavor }}" version
+  command: "{{ beats_flavor }} version"
   changed_when: false
-  register: auditbeat_full_version
+  register: beats_full_version
 
-- name: Register auditbeat version
+- name: Register beats version
   set_fact:
-    auditbeat_full_version: >-
+    beats_full_version: >-
       {{
-        auditbeat_full_version.stdout
-        | regex_replace('^auditbeat version ([0-9]+\.[0-9]+\.[0-9]) .*$', '\1')
+        beats_full_version.stdout
+        | regex_replace('^' + beats_flavor + ' version ([0-9]+\.[0-9]+\.[0-9]) .*$', '\1')
       }}

@@ -2,7 +2,7 @@
 
 - name: Create kibana  certificates folder
   file:
-    path: "{{ auditbeat_certificates_dir }}/kibana"
+    path: "{{ beats_certificates_dir }}/kibana"
     state: directory
     owner: root
     group: root
@@ -11,62 +11,62 @@
 - name: Upload certificates
   copy:
     src: "{{ item }}"
-    dest: "{{ auditbeat_certificates_dir }}/{{ item | basename }}"
+    dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
     owner: root
     group: root
     mode: 0o644
   when:
     - item != None
   loop:
-    - "{{ auditbeat_kibana_ssl_ca }}"
-    - "{{ auditbeat_kibana_ssl_crt }}"
-    - "{{ auditbeat_kibana_ssl_key }}"
-  notify: auditbeat restart service
+    - "{{ beats_kibana_ssl_ca }}"
+    - "{{ beats_kibana_ssl_crt }}"
+    - "{{ beats_kibana_ssl_key }}"
+  notify: beats restart service
 
-- name: Add Kibana endpoint to auditbeat configuration
+- name: Add Kibana endpoint to {{ beats_flavor }} configuration
   set_fact:
-    auditbeat_combined_config: >-
+    beats_combined_config: >-
       {{
-        _auditbeat_kibana_endpoint
-        | combine(_auditbeat_kibana_security, recursive=true)
-        | combine(auditbeat_combined_config, recursive=true)
+        _beats_kibana_endpoint
+        | combine(_beats_kibana_security, recursive=true)
+        | combine(beats_combined_config, recursive=true)
       }}
   vars:
-    _auditbeat_kibana_endpoint:
+    _beats_kibana_endpoint:
       setup:
         dashboards:
           enabled: true
         kibana:
-          host: "{{ auditbeat_kibana_host }}"
-          path: "{{ auditbeat_kibana_path | default('', true) }}"
-    _auditbeat_kibana_security: >-
+          host: "{{ beats_kibana_host }}"
+          path: "{{ beats_kibana_path | default('', true) }}"
+    _beats_kibana_security: >-
       {
         'setup': {
           'kibana': {
-            {%- if auditbeat_kibana_username != None -%}
+            {%- if beats_kibana_username != None -%}
               'username': '${KIBANA_USER}',
             {%- endif -%}
-            {%- if auditbeat_kibana_password != None -%}
+            {%- if beats_kibana_password != None -%}
               'password': '${KIBANA_PASS}',
             {%- endif -%}
             'ssl': {
-              {%- if auditbeat_kibana_ssl_ca != None -%}
-                'certificate_authorities': '{{ auditbeat_certificates_dir
-                            }}/kibana/{{ auditbeat_kibana_ssl_ca | basename }}',
+              {%- if beats_kibana_ssl_ca != None -%}
+                'certificate_authorities': '{{ beats_certificates_dir
+                            }}/kibana/{{ beats_kibana_ssl_ca | basename }}',
               {%- endif -%}
-              {%- if auditbeat_kibana_ssl_crt != None -%}
-                'certificate': '{{ auditbeat_certificates_dir }}/kibana/{{
-                                        auditbeat_kibana_ssl_crt | basename }}',
+              {%- if beats_kibana_ssl_crt != None -%}
+                'certificate': '{{ beats_certificates_dir }}/kibana/{{
+                                        beats_kibana_ssl_crt | basename }}',
               {%- endif -%}
-              {%- if auditbeat_kibana_ssl_key != None -%}
-                'key': '{{ auditbeat_certificates_dir }}/kibana/{{
-                                        auditbeat_kibana_ssl_key | basename }}',
+              {%- if beats_kibana_ssl_key != None -%}
+                'key': '{{ beats_certificates_dir }}/kibana/{{
+                                        beats_kibana_ssl_key | basename }}',
               {%- endif -%}
-              {%- if auditbeat_kibana_ssl_key_passphrase != None -%}
+              {%- if beats_kibana_ssl_key_passphrase != None -%}
                 'key_passphrase': '${ES_KIBANA_CERT_PASSPHRASE}',
               {%- endif -%}
               'enabled': {{
-                          auditbeat_kibana.ssl.enabled | default(false, true) }}
+                          beats_kibana.ssl.enabled | default(false, true) }}
             }
           }
         }

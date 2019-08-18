@@ -1,15 +1,15 @@
 ---
 
-- name: Extract the auditbeat index template
+- name: Extract the beats index template
   shell: >-
-    auditbeat export template > \
-      /tmp/auditbeat.{{ auditbeat_full_version }}.template.json
+    {{ beats_flavor }} export template > \
+      /tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
   args:
     executable: /bin/bash
   changed_when: false
 
-- name: Download the auditbeat index template
+- name: Download the {{ beats_flavor }} index template
   fetch:
-    src: "/tmp/auditbeat.{{ auditbeat_full_version }}.template.json"
-    dest: "{{ auditbeat_index_template_download_dir }}"
+    src: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
+    dest: "{{ beats_index_template_download_dir }}"
     flat: true

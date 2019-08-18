@@ -1,0 +1,10 @@
+---
+
+- name: Upload rules bundled with the role
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/beats/{{ beats_rule_dir }}"
+    owner: root
+    group: root
+    mode: 0o644
+  loop: "{{ beats_enabled_bundled_rules }}"

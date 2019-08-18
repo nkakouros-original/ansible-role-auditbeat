@@ -2,15 +2,15 @@
 
 - name: Enable systemd service
   systemd:
-    name: auditbeat
+    name: "{{ beats_flavor }}"
     state: started
     enabled: true
 
 - name: Get service facts
   service_facts: ~
 
-- name: Check that auditbeat service has started successfully
+- name: Check that {{ beats_flavor }} service has started successfully
   assert:
     that:
-      'ansible_facts.services["auditbeat.service"]["state"] == "running"'
-    msg: 'audibeat.service failed to start'
+      "ansible_facts.services['{{ beats_flavor }}.service']['state'] == 'running'"
+    msg: "{{ beats_flavor }}.service failed to start"

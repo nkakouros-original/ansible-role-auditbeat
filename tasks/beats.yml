@@ -4,26 +4,28 @@
 
 - include_tasks: variables.yml
 
-- include_tasks: core/system.yml
+# - include_tasks: core/system.yml
 
-- include_tasks: "core/install/{{ ansible_os_family }}.yml"
+# - include_tasks: "core/install/{{ ansible_os_family }}.yml"
 
 - include_tasks: core/version.yml
 
 - include_tasks: core/keystore.yml
 
 - include_tasks: outputs/index.yml
-  when: auditbeat_extract_index_template | bool
+  when: beats_extract_index_template | bool
 
 - include_tasks: outputs/certificates.yml
-  when: auditbeat_certificates != None
+  when: beats_certificates != None
 
 - include_tasks: outputs/kibana.yml
-  when: auditbeat_install_kibana_dashboards | bool
+  when: beats_install_kibana_dashboards | bool
 
 - include_tasks: outputs/keystore.yml
 
 - include_tasks: core/configure.yml
+
+- include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
 
 - meta: flush_handlers
 

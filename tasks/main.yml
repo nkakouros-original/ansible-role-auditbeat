@@ -1,4 +1,4 @@
 ---
 
-- include_tasks: auditbeat.yml
-  when: auditbeat_enabled | bool
+- include_tasks: beats.yml
+  when: beats_enabled | bool

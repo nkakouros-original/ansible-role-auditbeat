@@ -4,36 +4,27 @@
   copy:
     content: >-
       {{
-        auditbeat_combined_config
+        beats_combined_config
         | to_nice_yaml(indent=2, explicit_start=true)
       }}
-    dest: /etc/auditbeat/auditbeat.yml
+    dest: "/etc/{{ beats_flavor }}/{{ beats_flavor }}.yml"
     owner: root
     group: root
     mode: 0o644
-    # validate: auditbeat test config --path.config %s
-  notify: auditbeat restart service
+    # validate: beats test config --path.config %s
+  notify: beats restart service
 
 - name: Create systemd override file
   copy:
-    content: "{{ auditbeat_systemd_override }}"
-    dest: /etc/systemd/system/auditbeat.service.d/override.conf
+    content: "{{ beats_systemd_override }}"
+    dest: "/etc/systemd/system/{{ beats_flavor }}.service.d/override.conf"
     owner: root
     group: root
     mode: 0o644
-  when: auditbeat_systemd_override != None
-  notify: auditbeat restart service
-
-- name: Upload rules bundled with the role
-  copy:
-    src: "{{ item }}"
-    dest: "/etc/auditbeat/{{ auditbeat_rule_dir }}"
-    owner: root
-    group: root
-    mode: 0o644
-  loop: "{{ auditbeat_enabled_bundled_rules }}"
+  when: beats_systemd_override != None
+  notify: beats restart service
 
 - name: Check that the output can be reached successfully
-  command: auditbeat test output
+  command: "{{ beats_flavor }} test output"
   changed_when: false
-  when: auditbeat_check_output | bool
+  when: beats_check_output | bool
