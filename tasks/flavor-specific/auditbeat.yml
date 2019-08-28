@@ -1,10 +1,27 @@
 ---
 
-- name: Upload rules bundled with the role
-  copy:
+- name: auditbeat specific tasks on Linux
+  block:
+    - name: Disable journald-audit on Linux
+      systemd:
+        name: systemd-journald-audit.socket
+        masked: true
+        enabled: false
+        state: stopped
+      when: beats_mask_journald_audit | bool
+
+    - name: Upload rules bundled with the role on Linux
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/beats/{{ beats_rules_dir }}/"
+        owner: root
+        group: root
+        mode: 0o644
+      loop: "{{ beats_enabled_bundled_rules }}"
+  when: ansible_os_family != 'Windows'
+
+- name: Upload rules bundled with the role on Windows
+  win_copy:
     src: "{{ item }}"
-    dest: "/etc/beats/{{ beats_rule_dir }}"
-    owner: root
-    group: root
-    mode: 0o644
+    dest: "/etc/beats/{{ beats_rules_dir }}/"
   loop: "{{ beats_enabled_bundled_rules }}"

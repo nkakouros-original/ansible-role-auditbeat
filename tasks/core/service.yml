@@ -1,16 +1,25 @@
 ---
 
-- name: Enable systemd service
-  systemd:
+- name: "{{ beats_flavor }} service tasks on Linux"
+  block:
+    - name: Enable systemd service
+      systemd:
+        name: "{{ beats_flavor }}"
+        state: started
+        enabled: true
+
+    - name: Get service facts
+      service_facts: ~
+
+    - name: Check that {{ beats_flavor }} service has started successfully
+      assert:
+        that:
+          "ansible_facts.services['{{ beats_flavor }}.service']['state'] == 'running'"
+        msg: "{{ beats_flavor }}.service failed to start"
+  when: ansible_os_family != 'Windows'
+
+- name: Start windows service
+  win_service:
     name: "{{ beats_flavor }}"
-    state: started
-    enabled: true
-
-- name: Get service facts
-  service_facts: ~
-
-- name: Check that {{ beats_flavor }} service has started successfully
-  assert:
-    that:
-      "ansible_facts.services['{{ beats_flavor }}.service']['state'] == 'running'"
-    msg: "{{ beats_flavor }}.service failed to start"
+    state: restarted
+  when: ansible_os_family == 'Windows'

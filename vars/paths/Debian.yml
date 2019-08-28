@@ -1,0 +1,7 @@
+---
+
+_beats_path_home: "/usr/share/{{ beats_flavor }}"
+_beats_path_config: "/etc/{{ beats_flavor }}"
+_beats_path_data: "/var/lib/{{ beats_flavor }}"
+_beats_path_logs: "/var/log/{{ beats_flavor }}"
+_beats_certificates_dir: /etc/{{ beats_flavor }}/certs/

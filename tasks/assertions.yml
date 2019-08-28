@@ -3,5 +3,12 @@
 - name: Check OS is supported
   assert:
     that:
-      - "ansible_os_family in ['Debian']"
+      - "ansible_os_family in ['Debian', 'Windows']"
     msg: "{{ ansible_os_family }} is not supported"
+
+- name: Check if beats is supported on OS
+  assert:
+    that:
+      - "ansible_os_family == 'Windows'"
+    msg: 'winlogbeat can only be installed on Windows'
+  when: beats_flavor == 'winlogbeat'

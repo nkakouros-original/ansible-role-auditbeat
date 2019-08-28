@@ -1,21 +1,39 @@
 ---
 
-- name: Create certificates folder
-  file:
-    path: "{{ beats_certificates_dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0o755
+- name: "{{ beats_flavor }} certificates tasks for Linux"
+  block:
+    - name: Create certificates folder on Linux
+      file:
+        path: "{{ beats_certificates_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0o755
 
-- name: Upload certificates
-  copy:
-    src: "{{ item.value }}"
-    dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
-    owner: root
-    mode: "{{ '0o400' if item.key == 'key' else '0o644' }}"
-  loop: "{{ beats_certificates| dict2items }}"
-  notify: beats restart service
+    - name: Upload certificates on Linux
+      copy:
+        src: "{{ item.value }}"
+        dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
+        owner: root
+        mode: "{{ '0o400' if item.key == 'key' else '0o644' }}"
+      loop: "{{ beats_certificates| dict2items }}"
+      notify: beats restart service
+  when: ansible_os_family != 'Windows'
+
+- name: "{{ beats_flavor }} certificates tasks for Windows"
+  block:
+    - name: Create certificates folder on Windows
+      win_file:
+        path: "{{ beats_certificates_dir }}"
+        state: directory
+
+    - name: Upload certificates on Windows
+      win_copy:
+        src: "{{ item.value }}"
+        dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
+      loop: "{{ beats_certificates| dict2items }}"
+      notify: beats restart service
+  when: ansible_os_family == 'Windows'
 
 - name: Add certificates configuration
   set_fact:

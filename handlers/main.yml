@@ -6,10 +6,12 @@
     state: restarted
     daemon_reload: true
   listen: beats restart service
+  when: ansible_os_family != 'Windows'
 
 - name: Get service facts
   service_facts: ~
   listen: beats restart service
+  when: ansible_os_family != 'Windows'
 
 - name: Check that beats service has started successfully
   assert:
@@ -17,3 +19,11 @@
       "ansible_facts.services['{{ beats_flavor }}.service']['state'] == 'running'"
     msg: "{{ beats_flavor }}.service failed to start"
   listen: beats restart service
+  when: ansible_os_family != 'Windows'
+
+- name: Start windows service
+  win_service:
+    name: "{{ beats_flavor }}"
+    state: restarted
+  listen: beats restart service
+  when: ansible_os_family == 'Windows'

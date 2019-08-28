@@ -1,6 +1,56 @@
 ---
 
-- include_vars: "{{ beats_flavor }}.yml"
+- include_vars: "paths/{{ ansible_os_family }}.yml"
+
+- name: Set beats_certificates_dir
+  set_fact:
+    beats_certificates_dir: "{{ _beats_certificates_dir }}"
+  when: beats_certificates_dir  == None
+
+- name: Set beats_path_home
+  set_fact:
+    beats_path_home: "{{ _beats_path_home }}"
+  when: beats_path_home  == None
+
+- name: Set beats_path_config
+  set_fact:
+    beats_path_config: "{{ _beats_path_config }}"
+  when: beats_path_config == None
+
+- name: Set beats_path_data
+  set_fact:
+    beats_path_data: "{{ _beats_path_data }}"
+  when: beats_path_data  == None
+
+- name: Set beats_path_logs
+  set_fact:
+    beats_path_logs: "{{ _beats_path_logs }}"
+  when: beats_path_logs  == None
+
+# The following 4 variables make sure that forward slashes in paths are
+# converted to backslashes. This is needed when installing on Windows and using
+# the paths in `win_command` and `win_shell` modules.
+- name: Set beats_path_data_backslashes
+  set_fact:
+    beats_path_data_backslashes: >-
+      {{ beats_path_data | regex_replace('/', '\\') }}
+
+- name: Set beats_path_home_backslashes
+  set_fact:
+    beats_path_home_backslashes: >-
+      {{ beats_path_home | regex_replace('/', '\\') }}
+
+- name: Set beats_path_config_backslashes
+  set_fact:
+    beats_path_config_backslashes: >-
+      {{ beats_path_config | regex_replace('/', '\\') }}
+
+- name: Set beats_path_logs_backslashes
+  set_fact:
+    beats_path_logs_backslashes: >-
+      {{ beats_path_logs | regex_replace('/', '\\') }}
+
+- include_vars: "configs/{{ beats_flavor }}.yml"
 
 - name: Merge user conf with defaults
   set_fact:
@@ -9,3 +59,15 @@
         _beats_default_config
         | combine(beats_config, recursive=True)
       }}
+
+- name: Set beats_linux_exec
+  set_fact:
+    beats_linux_exec: "{{ beats_flavor
+      }} --path.data {{ beats_path_data
+      }} --path.config {{ beats_path_config
+      }} --path.home {{ beats_path_home
+      }} --path.logs {{ beats_path_logs }}"
+
+- name: Set beats_win_exec
+  set_fact:
+    beats_win_exec: "{{ beats_flavor }} --path.data {{ beats_path_data_backslashes }} --path.config {{ beats_path_home_backslashes }} --path.home {{ beats_path_home_backslashes }} --path.logs {{ beats_path_logs_backslashes }}"

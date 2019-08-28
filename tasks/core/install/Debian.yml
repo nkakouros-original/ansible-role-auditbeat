@@ -1,5 +1,10 @@
 ---
 
+- name: Install dependencies
+  apt:
+    name: libpcap0.8
+  when: beats_flavor == 'packetbeat'
+
 - name: Install https apt transport
   apt:
     name: apt-transport-https

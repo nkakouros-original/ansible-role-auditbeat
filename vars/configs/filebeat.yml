@@ -1,0 +1,28 @@
+---
+
+# Default config coming with filebeat 7.0
+_beats_default_config:
+  name: "{{ beats_name }}"
+  path:
+    home: "{{ beats_path_home }}"
+    config: "{{ beats_path_config }}"
+    data: "{{ beats_path_data }}"
+    logs: "{{ beats_path_logs }}"
+  filebeat:
+    inputs:
+      - type: log
+        enabled: false
+        paths:
+          - /var/log/*.log
+    config:
+      modules:
+        path: ${path.config}/modules.d/*.yml
+        reload:
+          enabled: false
+  setup:
+    template:
+      settings:
+        index:
+          number_of_shards: 1
+    dashboards:
+      enabled: false

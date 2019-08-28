@@ -7,6 +7,21 @@ beats_flavor: auditbeat
 # Set this variable to the name of the beat that you want the role to install
 # and configure.
 
+beats_unset_facts: false
+# Set this to true to set to None some variables that this role uses. Set it to
+# true if you want to use this role multiple times during an ansible run.
+# Such variables are set to defaults by the role, not through this defaults.yml
+# file but by using `set_fact` tasks. This is done to provide default based on
+# the OS you are using. This single defaults.yml file could have only been used
+# to provide defaults for a single OS. Since these variables are assigned
+# a value with `set_fact`, they will keep their value throughout an ansible run,
+# ie they will be exposed to the playbook. If you include this role more than
+# once, eg in a loop, in order to install more than one beat (eg both auditbeat
+# and packetbeat), the `set_fact` tasks this role uses will be skipped since the
+# variables already have a value. This means that the second beat will be
+# installed with the settings of the first, which is wrong. Setting
+# `beats_unset_facts` to true, will unset such sensitive variables so that the
+# second beat can be configured properly.
 # Installation {{{
 # The version of beats to use, eg 6, 7, etc. This is only used when
 # `beats_use_upstream_repo` is set to `true`
@@ -23,13 +38,19 @@ beats_certificates: ~
 #   cert: path/to/node/cert
 #   key: path/to/node/key
 
-beats_certificates_dir: /etc/auditbeat/certs/
-# The folder where `beats_certificates` will be uploaded into.
+beats_certificates_dir: ~
+# The folder where `beats_certificates` will be uploaded into. If you leave this
+# empty, the folder depends on the OS you are using and is defined in the
+# `vars/paths/YOUR_OS_FAMILY_HERE.yml` file that comes with this role (via the
+# `_beats_certificates_dir` file).
 
-beats_certificates_password: ~
+beats_certificates_password: ''
 # The password used to protect the generated private keys. Leave empty if the
 # certificates are not password protected. The password will be available as
-# `${OUTPUT_CERT_KEY_PASSPHRASE}` to use in `beats_config`.
+# `${OUTPUT_CERT_KEY_PASSPHRASE}` to use in `beats_config`. An empty password
+# equals an unset password. Do not set this variable to None/~ as in this case,
+# it will not be added to the keystore. This will lead to the variable
+# `${OUTPUT_CERT_KEY_PASSPHRASE}` to be undefined in `beats_config`.
 
 beats_keystore_update: false
 # Set to true if you need to update the passwords and certificate passphrases
@@ -43,10 +64,6 @@ beats_systemd_override: ~
 # beats_systemd_override: |
 #   [Service]
 #   Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
-
-beats_mask_journald_audit: true
-# Set this to true to prevent journald from listening for audit messages. This
-# should save on CPU and disk space.
 
 beats_check_output: false
 # Check if beats can connect successfully to the configured output before
@@ -68,6 +85,19 @@ beats_config: {}
 
 beats_name: "{{ inventory_hostname }}"
 # The name of the beat.
+
+# CURRENTLY UNSUPPORTED, DO NOT USE
+beats_path_home: ~
+beats_path_config: ~
+beats_path_data: ~
+beats_path_logs: ~
+# Use this variables to override the default paths that come with this role for
+# your OS (which are set based on the official Beats documentation).
+# These are currently not supported. To support them, the role will need:
+# - in the case of linux, have additional tasks to create systemd overrides that
+# use the paths the user has defined
+# - in the case of windows, find a way to override the paths that the service is
+# passing to the beats executable.
 # }}}
 # Other {{{
 beats_extract_index_template: false
@@ -124,11 +154,20 @@ beats_enabled_bundled_rules: []
 # beats_enabled_bundled_roles:
 #   - 00-default-rules.conf
 # ```
-# These files will be uploaded to `beats_rule_dir`.
+# These files will be uploaded to `beats_rules_dir`.
 
-beats_rule_dir: /etc/beats/audit.rules.d
+beats_rules_dir: /etc/beats/audit.rules.d
 # The directory where audit rule files are located. These setting is also used
 # by the role to know where it should upload the files in
 # `beats_enabled_bundled_rules`. This directory will be searched for
 # `*.conf` files.
+
+beats_mask_journald_audit: true
+# Set this to true to prevent journald from listening for audit messages. This
+# should save on CPU and disk space.
+# }}}
+# Filebeat {{{
+beat_filebeat_modules: []
+# The list of default configurations for filebeat modules to enable. These
+# configurations come shipped with filebeat.
 # }}}

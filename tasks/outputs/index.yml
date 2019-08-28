@@ -1,15 +1,35 @@
 ---
 
-- name: Extract the beats index template
-  shell: >-
-    {{ beats_flavor }} export template > \
-      /tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
-  args:
-    executable: /bin/bash
-  changed_when: false
+- name: "{{ beats_flavor }} index tasks for Linux"
+  block:
+    - name: Extract the beats index template on Linux
+      shell: >-
+        {{ beats_linux_exec }} export template > \
+          /tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
+      args:
+        executable: /bin/bash
+      changed_when: false
 
-- name: Download the {{ beats_flavor }} index template
-  fetch:
-    src: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
-    dest: "{{ beats_index_template_download_dir }}"
-    flat: true
+    - name: Download the {{ beats_flavor }} index template on Linux
+      fetch:
+        src: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
+        dest: "{{ beats_index_template_download_dir }}"
+        flat: true
+  when: ansible_os_family != 'Windows'
+
+- name: "{{ beats_flavor }} index tasks for Windows"
+  block:
+    - name: Extract the beats index template on Windows
+      win_shell: >-
+        {{ beats_win_exec }} export template > C:/Users/printer/AppData/Local/Temp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
+      args:
+        executable: powershell
+      changed_when: false
+
+    - name: Download the {{ beats_flavor }} index template on Windows
+      fetch:
+        src: "C:/Users/printer/AppData/Local/Temp/{{
+          beats_flavor }}.{{ beats_full_version }}.template.json"
+        dest: "{{ beats_index_template_download_dir }}"
+        flat: true
+  when: ansible_os_family == 'Windows'

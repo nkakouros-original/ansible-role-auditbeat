@@ -1,30 +1,63 @@
 ---
 
-- name: Upload configuration
-  copy:
-    content: >-
-      {{
-        beats_combined_config
-        | to_nice_yaml(indent=2, explicit_start=true)
-      }}
-    dest: "/etc/{{ beats_flavor }}/{{ beats_flavor }}.yml"
-    owner: root
-    group: root
-    mode: 0o644
-    # validate: beats test config --path.config %s
-  notify: beats restart service
+- name: "{{ beats_flavor }} configuration tasks for Linux"
+  block:
+    - name: Upload configuration on Linux
+      copy:
+        content: >-
+          {{
+            beats_combined_config
+            | to_nice_yaml(indent=2, explicit_start=true)
+          }}
+        dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+        owner: root
+        group: root
+        mode: 0o644
+        # validate: beats test config --path.config %s
+      notify: beats restart service
 
-- name: Create systemd override file
-  copy:
-    content: "{{ beats_systemd_override }}"
-    dest: "/etc/systemd/system/{{ beats_flavor }}.service.d/override.conf"
-    owner: root
-    group: root
-    mode: 0o644
-  when: beats_systemd_override != None
-  notify: beats restart service
+    - name: Create systemd override file on Linux
+      copy:
+        content: "{{ beats_systemd_override }}"
+        dest: "{{ beats_path_config }}/system/{{
+                  beats_flavor }}.service.d/override.conf"
+        owner: root
+        group: root
+        mode: 0o644
+      when: beats_systemd_override != None
+      notify: beats restart service
 
-- name: Check that the output can be reached successfully
-  command: "{{ beats_flavor }} test output"
-  changed_when: false
-  when: beats_check_output | bool
+    - name: Check that the output can be reached successfully on Linux
+      command: "{{ beats_flavor }} test output"
+      changed_when: false
+      when: beats_check_output | bool
+  when: ansible_os_family != 'Windows'
+
+- name: "{{ beats_flavor }} configuration tasks for Windows"
+  block:
+    - name: Upload configuration on Windows
+      win_copy:
+        content: >-
+          {{
+            beats_combined_config
+            | to_nice_yaml(indent=2, explicit_start=true)
+          }}
+        dest: "{{ beats_path_config }}/system/{{
+                  beats_flavor }}.service.d/override.conf"
+        dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+        # validate: beats test config --path.config %s
+      notify: beats restart service
+
+    - name: Create systemd override file on Windows
+      win_copy:
+        content: "{{ beats_systemd_override }}"
+        dest: "{{ beats_path_config }}/system/{{
+                  beats_flavor }}.service.d/override.conf"
+      when: beats_systemd_override != None
+      notify: beats restart service
+
+    - name: Check that the output can be reached successfully on Windows
+      win_command: "{{ beats_flavor }} test output"
+      changed_when: false
+      when: beats_check_output | bool
+  when: ansible_os_family == 'Windows'

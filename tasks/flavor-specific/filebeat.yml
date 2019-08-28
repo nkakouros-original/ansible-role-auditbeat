@@ -1,0 +1,14 @@
+---
+
+# TODO allow uploading custom input configurations
+# TODO allow uplodaing custom module configurations
+
+- name: Enable filebeat modules
+  command: "{{ beats_linux_exec }} modules enable {{
+                      beat_filebeat_modules | join(' ') }}"
+  when: ansible_os_family != 'Windows'
+
+- name: Enable filebeat modules
+  win_command: "{{ beats_win_exec }} modules enable {{
+                        beat_filebeat_modules | join(' ') }}"
+  when: ansible_os_family == 'Windows'

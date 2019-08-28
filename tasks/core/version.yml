@@ -1,14 +1,23 @@
 ---
 
-- name: Get "{{ beats_flavor }}" version
-  command: "{{ beats_flavor }} version"
+- name: Get {{ beats_flavor }} version on Linux
+  command: "{{ beats_linux_exec }} version"
   changed_when: false
-  register: beats_full_version
+  register: beats_full_version_linux
+  when: ansible_os_family != 'Windows'
+
+- name: Get {{ beats_flavor }} version on Windows
+  win_command: "{{ beats_win_exec }} version"
+  changed_when: false
+  register: beats_full_version_windows
+  when: ansible_os_family == 'Windows'
 
 - name: Register beats version
   set_fact:
     beats_full_version: >-
       {{
-        beats_full_version.stdout
+        beats_full_version_linux.stdout
+        | default(beats_full_version_windows.stdout)
         | regex_replace('^' + beats_flavor + ' version ([0-9]+\.[0-9]+\.[0-9]) .*$', '\1')
+        | trim
       }}

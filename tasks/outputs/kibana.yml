@@ -1,27 +1,50 @@
 ---
 
-- name: Create kibana  certificates folder
-  file:
-    path: "{{ beats_certificates_dir }}/kibana"
-    state: directory
-    owner: root
-    group: root
-    mode: 0o755
+- name: "{{ beats_flavor }} kibana tasks for Linux"
+  block:
+    - name: Create kibana certificates folder on Linux
+      file:
+        path: "{{ beats_certificates_dir }}/kibana"
+        state: directory
+        owner: root
+        group: root
+        mode: 0o755
 
-- name: Upload certificates
-  copy:
-    src: "{{ item }}"
-    dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
-    owner: root
-    group: root
-    mode: 0o644
-  when:
-    - item != None
-  loop:
-    - "{{ beats_kibana_ssl_ca }}"
-    - "{{ beats_kibana_ssl_crt }}"
-    - "{{ beats_kibana_ssl_key }}"
-  notify: beats restart service
+    - name: Upload certificates on Linux
+      copy:
+        src: "{{ item }}"
+        dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
+        owner: root
+        group: root
+        mode: 0o644
+      when:
+        - item != None
+      loop:
+        - "{{ beats_kibana_ssl_ca }}"
+        - "{{ beats_kibana_ssl_crt }}"
+        - "{{ beats_kibana_ssl_key }}"
+      notify: beats restart service
+  when: ansible_os_family != 'Windows'
+
+- name: "{{ beats_flavor }} kibana tasks for Windows"
+  block:
+    - name: Create kibana certificates folder on Windows
+      win_file:
+        path: "{{ beats_certificates_dir }}/kibana"
+        state: directory
+
+    - name: Upload certificates on Windows
+      win_copy:
+        src: "{{ item }}"
+        dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
+      when:
+        - item != None
+      loop:
+        - "{{ beats_kibana_ssl_ca }}"
+        - "{{ beats_kibana_ssl_crt }}"
+        - "{{ beats_kibana_ssl_key }}"
+      notify: beats restart service
+  when: ansible_os_family == 'Windows'
 
 - name: Add Kibana endpoint to {{ beats_flavor }} configuration
   set_fact:

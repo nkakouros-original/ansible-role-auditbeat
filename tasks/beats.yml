@@ -4,9 +4,7 @@
 
 - include_tasks: variables.yml
 
-# - include_tasks: core/system.yml
-
-# - include_tasks: "core/install/{{ ansible_os_family }}.yml"
+- include_tasks: "core/install/{{ ansible_os_family }}.yml"
 
 - include_tasks: core/version.yml
 
@@ -26,7 +24,10 @@
 - include_tasks: core/configure.yml
 
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
+  when: (role_path + '/tasks/flavor-specific/' + beats_flavor + '.yml') is file
 
 - meta: flush_handlers
 
 - include_tasks: core/service.yml
+
+- include_tasks: outro.yml

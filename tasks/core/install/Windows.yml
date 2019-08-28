@@ -1,0 +1,5 @@
+---
+
+- name: Install {{ beats_flavor }}
+  win_chocolatey:
+    name: "{{ beats_flavor }}"
