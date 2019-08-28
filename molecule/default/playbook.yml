@@ -1,11 +1,20 @@
 ---
 - name: Converge
   hosts: all
-  roles:
-    - role: ansible-role-beats
   vars:
     beats_mask_journald_audit: false
     beats_config:
       output:
         console:
           pretty: true
+  tasks:
+    - name: Run the role
+      include_role:
+        name: ansible-role-beats
+      vars:
+        beats_flavor: "{{ item }}"
+      loop:
+        - packetbeat
+        - filebeat
+        - auditbeat
+        # - winlogbeat
