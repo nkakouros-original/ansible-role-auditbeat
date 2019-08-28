@@ -4,6 +4,7 @@
   systemd:
     name: "{{ beats_flavor }}"
     state: restarted
+    enabled: true
     daemon_reload: true
   listen: beats restart service
   when: ansible_os_family != 'Windows'

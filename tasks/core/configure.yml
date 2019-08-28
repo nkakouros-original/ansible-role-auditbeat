@@ -42,8 +42,6 @@
             beats_combined_config
             | to_nice_yaml(indent=2, explicit_start=true)
           }}
-        dest: "{{ beats_path_config }}/system/{{
-                  beats_flavor }}.service.d/override.conf"
         dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
         # validate: beats test config --path.config %s
       notify: beats restart service

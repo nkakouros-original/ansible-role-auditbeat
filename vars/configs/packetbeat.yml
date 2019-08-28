@@ -30,7 +30,7 @@ _beats_default_config:
       - type: memcache
         ports: [11211]
       - type: mysql
-        ports: [3306,3307]
+        ports: [3306, 3307]
       - type: pgsql
         ports: [5432]
       - type: redis

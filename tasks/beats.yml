@@ -28,6 +28,4 @@
 
 - meta: flush_handlers
 
-- include_tasks: core/service.yml
-
 - include_tasks: outro.yml
