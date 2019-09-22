@@ -1,5 +1,18 @@
 ---
 
-- name: Install {{ beats_flavor }}
-  win_chocolatey:
+# The chocolatey script that installs packetbeat, has a dependency of winpcap.
+# However, chocolatey fails to install winpcap in non-interactive mode, yet it
+# reports success and packetbeat fails to execute.
+- name: Install Win10Pcap if installing packetbeat
+  block:
+    - win_get_url:
+        url: http://www.win10pcap.org/download/Win10Pcap-v10.2-5002.msi
+        dest: C:\Windows\Temp\
+
+    - win_package:
+        path: C:\Windows\Temp\Win10Pcap-v10.2-5002.msi
+        arguments: /quiet
+  when: beats_flavor == 'packetbeat'
+
+- win_chocolatey:
     name: "{{ beats_flavor }}"
