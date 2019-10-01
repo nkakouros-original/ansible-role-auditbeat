@@ -166,8 +166,16 @@ beats_mask_journald_audit: true
 # Set this to true to prevent journald from listening for audit messages. This
 # should save on CPU and disk space.
 # }}}
-# Filebeat {{{
+# Filebeat specifics {{{
 beat_filebeat_modules: []
 # The list of default configurations for filebeat modules to enable. These
 # configurations come shipped with filebeat.
+# }}}
+# Heartbeat specifics {{{
+beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/*.yml
+# A directory where dynamically loaded monitor config files are located.
+
+beats_heartbeat_monitor_files: []
+# A list of monitor conf files that should be uploaded to
+# `beats_heartbeat_monitor_files`.
 # }}}

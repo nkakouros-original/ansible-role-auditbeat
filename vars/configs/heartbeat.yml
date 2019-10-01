@@ -1,0 +1,25 @@
+---
+
+_beats_default_config:
+  name: "{{ beats_name }}"
+  path:
+    home: "{{ beats_path_home }}"
+    config: "{{ beats_path_config }}"
+    data: "{{ beats_path_data }}"
+    logs: "{{ beats_path_logs }}"
+  heartbeat:
+    config:
+      monitors:
+        path: ${path.config}/monitors.d/*.yml
+      reload:
+        enabled: false
+        period: 5s
+    monitors:
+      - type: http
+        urls:
+          - "http://localhost:9200"
+        schedule: '@every 10s'
+  setup:
+    index:
+      number_of_shards: 1
+      codec: best_compression

@@ -25,3 +25,4 @@
     src: "{{ item }}"
     dest: "/etc/beats/{{ beats_rules_dir }}/"
   loop: "{{ beats_enabled_bundled_rules }}"
+  when: ansible_os_family == 'Windows'
