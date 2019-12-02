@@ -10,7 +10,7 @@ _beats_default_config:
   heartbeat:
     config:
       monitors:
-        path: ${path.config}/monitors.d/*.yml
+        path: "{{ beats_heartbeat_monitors_path }}/*.yml"
       reload:
         enabled: false
         period: 5s

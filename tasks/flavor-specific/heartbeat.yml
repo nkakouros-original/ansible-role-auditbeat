@@ -3,7 +3,7 @@
 - name: Upload rules bundled with the role on Linux
   copy:
     src: "{{ item }}"
-    dest: "/etc/beats/{{ beats_rules_dir }}/"
+    dest: "{{ beats_heartbeat_monitors_path }}/"
     owner: root
     group: root
     mode: 0o644
@@ -13,6 +13,6 @@
 - name: Upload rules bundled with the role on Windows
   win_copy:
     src: "{{ item }}"
-    dest: "/etc/beats/{{ beats_rules_dir }}/"
+    dest: "{{ beats_heartbeat_monitors_path }}/"
   loop: "{{ beats_heartbeat_monitor_files }}"
   when: ansible_os_family == 'Windows'

@@ -175,7 +175,7 @@ beat_filebeat_modules: []
 # configurations come shipped with filebeat.
 # }}}
 # Heartbeat specifics {{{
-beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/*.yml
+beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/
 # A directory where dynamically loaded monitor config files are located.
 
 beats_heartbeat_monitor_files: []
