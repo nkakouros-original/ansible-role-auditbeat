@@ -26,6 +26,9 @@ beats_unset_facts: false
 # The version of beats to use, eg 6, 7, etc. This is only used when
 # `beats_use_upstream_repo` is set to `true`
 beats_major_version: 7
+
+# Whether the beats service should be enabled at the end of the role.
+beats_enable_service: true
 # }}}
 # Certificates {{{
 beats_certificates: ~
