@@ -32,11 +32,11 @@ beats_enable_service: true
 # }}}
 # Certificates {{{
 beats_certificates: ~
-# Use this variable to point to certificate files on the ansible controller
-# that should be uploaded to the beats server. This variable will also be
-# used to constuct the relevant section in the output configuration of
-# beats.  The format of this variable is as follows:
-# beats_certificates:
+# Certificates that the beats output should use to authenticate with the remote
+# output.  Use this variable to point to certificate files on the ansible
+# controller that should be uploaded to the beats server. This variable will
+# also be used to constuct the relevant section in the output configuration of
+# beats.  The format of this variable is as follows: beats_certificates:
 #   ca: path/to/ca.cert
 #   cert: path/to/node/cert
 #   key: path/to/node/key

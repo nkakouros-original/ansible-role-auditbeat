@@ -17,7 +17,9 @@
   when: beats_certificates != None
 
 - include_tasks: outputs/kibana.yml
-  when: beats_install_kibana_dashboards | bool
+  when:
+    - beats_install_kibana_dashboards | bool
+    - beats_flavor != 'heartbeat'  # https://github.com/elastic/beats/pull/10294
 
 - include_tasks: outputs/keystore.yml
 
