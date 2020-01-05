@@ -21,6 +21,6 @@
 
 - name: Install "{{ beats_flavor }}"
   apt:
-    name: "{{ beats_flavor if 'heartbeat' != 'heartbeat'
+    name: "{{ beats_flavor if beats_flavor != 'heartbeat'
                 else 'heartbeat-elastic' }}"
     update_cache: true
