@@ -7,7 +7,7 @@ beats_flavor: auditbeat
 # Set this variable to the name of the beat that you want the role to install
 # and configure.
 
-beats_unset_facts: false
+beats_unset_facts: true
 # Set this to true to set to None some variables that this role uses. Set it to
 # true if you want to use this role multiple times during an ansible run.
 # Such variables are set to defaults by the role, not through this defaults.yml
@@ -55,7 +55,7 @@ beats_certificates_password: ''
 # it will not be added to the keystore. This will lead to the variable
 # `${OUTPUT_CERT_KEY_PASSPHRASE}` to be undefined in `beats_config`.
 
-beats_keystore_update: false
+beats_keystore_update: true
 # Set to true if you need to update the passwords and certificate passphrases
 # that are stored in the keystore. Set this to true if you changed any password
 # or passphrase.  This is false by default to support idempotency.
@@ -103,7 +103,7 @@ beats_path_logs: ~
 # passing to the beats executable.
 # }}}
 # Other {{{
-beats_extract_index_template: false
+beats_extract_index_template: true
 # Whether to extract the default index template that comes with beats. This
 # template is automatically loaded to elasticsearch if the elasticsearch output
 # is configured in the beats configuration. If, however, beats does not
