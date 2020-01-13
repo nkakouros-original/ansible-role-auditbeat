@@ -16,11 +16,16 @@
         # validate: beats test config --path.config %s
       notify: beats restart service
 
+    - name: Create systemd override file directory
+      file:
+        path: "/etc/systemd/system/{{ beats_flavor }}.service.d/"
+        state: directory
+      when: beats_systemd_override != None
+
     - name: Create systemd override file on Linux
       copy:
         content: "{{ beats_systemd_override }}"
-        dest: "{{ beats_path_config }}/system/{{
-                  beats_flavor }}.service.d/override.conf"
+        dest: "/etc/systemd/system/{{ beats_flavor }}.service.d/override.conf"
         owner: root
         group: root
         mode: 0o644
