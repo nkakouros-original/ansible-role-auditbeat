@@ -12,13 +12,8 @@ _beats_default_config:
       monitors:
         path: "{{ beats_heartbeat_monitors_path }}/*.yml"
       reload:
-        enabled: false
+        enabled: true
         period: 5s
-    monitors:
-      - type: http
-        urls:
-          - "http://localhost:9200"
-        schedule: '@every 10s'
   setup:
     index:
       number_of_shards: 1
