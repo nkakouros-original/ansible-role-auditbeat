@@ -29,10 +29,12 @@
   copy:
     content: |
       Unattended-Upgrade::Package-Blacklist {
-        "linux-headers*";
-        "linux-image*";
-        "linux-generic*";
-        "linux-modules*";
+        "auditbeat";
+        "heartbeat";
+        "filebeat";
+        "journalbeat";
+        "metricbeat";
+        "packetbeat";
       };
     dest: /etc/apt/apt.conf.d/55beats-disable
   when: beats_disable_system_updates | bool
