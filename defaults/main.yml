@@ -29,6 +29,11 @@ beats_major_version: 7
 
 # Whether the beats service should be enabled at the end of the role.
 beats_enable_service: true
+
+# Whether to exclude beats from system updates. Set this to true if you want to
+# manually update the beats. This is valid only for Linux servers that may have
+# some kind of unattended update mechanism.
+beats_disable_system_updates: false
 # }}}
 # Certificates {{{
 beats_certificates: ~

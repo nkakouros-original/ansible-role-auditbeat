@@ -24,3 +24,15 @@
     name: "{{ beats_flavor if beats_flavor != 'heartbeat'
                 else 'heartbeat-elastic' }}"
     update_cache: true
+
+- name: Disable automatic updates
+  copy:
+    content: |
+      Unattended-Upgrade::Package-Blacklist {
+        "linux-headers*";
+        "linux-image*";
+        "linux-generic*";
+        "linux-modules*";
+      };
+    dest: /etc/apt/apt.conf.d/55beats-disable
+  when: beats_disable_system_updates | bool
