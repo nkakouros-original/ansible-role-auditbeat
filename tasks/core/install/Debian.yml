@@ -37,4 +37,4 @@
         "packetbeat";
       };
     dest: /etc/apt/apt.conf.d/55beats-disable
-  when: beats_disable_system_updates | bool
+  when: beats_disable_auto_update | bool
