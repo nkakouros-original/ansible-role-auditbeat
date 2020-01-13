@@ -64,6 +64,10 @@ beats_keystore_update: false
 # Set to true if you need to update the passwords and certificate passphrases
 # that are stored in the keystore. Set this to true if you changed any password
 # or passphrase.  This is false by default to support idempotency.
+
+beats_certificates_verification: full
+# Control whether to verify the certificate that the server will present. Set it
+# to `none` to disable verification.
 # }}}
 # Configuration {{{
 beats_systemd_override: ~

@@ -46,7 +46,7 @@
     _beats_ssl_config:
       ssl:
         enabled: true
-        verification_mode: full
+        verification_mode: "{{ beats_certificates_verification }}"
         certificate_authorities: "{{ beats_certificates_dir }}/{{
                                     beats_certificates['ca'] | basename }}"
         certificate: "{{ beats_certificates_dir }}/{{
