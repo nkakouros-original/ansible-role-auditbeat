@@ -60,7 +60,7 @@ beats_certificates_password: ''
 # it will not be added to the keystore. This will lead to the variable
 # `${OUTPUT_CERT_KEY_PASSPHRASE}` to be undefined in `beats_config`.
 
-beats_keystore_update: true
+beats_keystore_update: false
 # Set to true if you need to update the passwords and certificate passphrases
 # that are stored in the keystore. Set this to true if you changed any password
 # or passphrase.  This is false by default to support idempotency.
