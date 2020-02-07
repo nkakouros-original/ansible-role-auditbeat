@@ -1,8 +1,8 @@
 ---
 
-- name: "{{ beats_flavor }} certificates tasks for Linux"
+- name: "{{ beats_flavor }}: certificates tasks for Linux"
   block:
-    - name: Create certificates folder on Linux
+    - name: "{{ beats_flavor }}: Create certificates folder on Linux"
       file:
         path: "{{ beats_certificates_dir }}"
         state: directory
@@ -10,7 +10,7 @@
         group: root
         mode: 0o755
 
-    - name: Upload certificates on Linux
+    - name: "{{ beats_flavor }}: Upload certificates on Linux"
       copy:
         src: "{{ item.value }}"
         dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
@@ -20,14 +20,14 @@
       notify: beats restart service
   when: ansible_os_family != 'Windows'
 
-- name: "{{ beats_flavor }} certificates tasks for Windows"
+- name: "{{ beats_flavor }}: certificates tasks for Windows"
   block:
-    - name: Create certificates folder on Windows
+    - name: "{{ beats_flavor }}: Create certificates folder on Windows"
       win_file:
         path: "{{ beats_certificates_dir }}"
         state: directory
 
-    - name: Upload certificates on Windows
+    - name: "{{ beats_flavor }}: Upload certificates on Windows"
       win_copy:
         src: "{{ item.value }}"
         dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
@@ -35,7 +35,7 @@
       notify: beats restart service
   when: ansible_os_family == 'Windows'
 
-- name: Add certificates configuration
+- name: "{{ beats_flavor }}: Add certificates configuration"
   set_fact:
     beats_combined_config: >-
       {{
@@ -57,10 +57,10 @@
     _beats_output_ssl_config: >-
       {%- set outputs = (beats_combined_config['output'].keys() | list) -%}
       {
-        {# only one output should be present #}
-        {%- for output in outputs -%}
-          'output': {
-            '{{ output }}': {{ _beats_ssl_config }}
-          }
-        {%- endfor -%}
+        {# only one output should be enabled #}
+        "output": {
+          {%- for output in outputs -%}
+            "{{ output }}": {{ _beats_ssl_config }},
+          {%- endfor -%}
+        }
       }

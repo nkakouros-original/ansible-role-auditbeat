@@ -1,18 +1,18 @@
 ---
 
-- name: Get {{ beats_flavor }} version on Linux
+- name: "{{ beats_flavor }}: Get version on Linux"
   command: "{{ beats_linux_exec }} version"
   changed_when: false
   register: beats_full_version_linux
   when: ansible_os_family != 'Windows'
 
-- name: Get {{ beats_flavor }} version on Windows
+- name: "{{ beats_flavor }}: Get version on Windows"
   win_command: "{{ beats_win_exec }} version"
   changed_when: false
   register: beats_full_version_windows
   when: ansible_os_family == 'Windows'
 
-- name: Register beats version
+- name: "{{ beats_flavor }}: Register beats version"
   set_fact:
     beats_full_version: >-
       {{

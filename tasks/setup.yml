@@ -1,0 +1,26 @@
+---
+
+- name: "{{ beats_flavor }}: Setup Kibana dashboards manually"
+  block:
+    - name: "{{ beats_flavor }}: Setup kibana dashboards manually on Linux"
+      command: "{{ beats_linux_exec }} setup --dashboards"
+      when: ansible_os_family != 'Windows'
+
+    - name: "{{ beats_flavor }}: Setup kibana dashboards manually on Windows"
+      win_command: "{{ beats_win_exec }} setup --dashboards"
+      when: ansible_os_family == 'Windows'
+  when:
+    - beats_config_kibana_endpoint | bool
+    - beats_setup_kibana_dashboards | bool
+    - beats_flavor != 'heartbeat'
+
+- name: "{{ beats_flavor }}: Load index templates, ilm policy manually"
+  block:
+    - name: "{{ beats_flavor }}: Load index templates, ilm policy manually on Linux"
+      command: "{{ beats_linux_exec }} setup --index-management"
+      when: ansible_os_family != 'Windows'
+
+    - name: "{{ beats_flavor }}: Load index templates, ilm policy manually on Windows"
+      win_command: "{{ beats_win_exec }} setup --index-management"
+      when: ansible_os_family == 'Windows'
+  when: beats_setup_index_management | bool

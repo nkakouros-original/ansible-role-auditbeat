@@ -1,14 +1,37 @@
 ---
 
-# TODO allow uploading custom input configurations
-# TODO allow uplodaing custom module configurations
+- name: "{{ beats_flavor }}: Create inputs directory"
+  file:
+    path: "{{ beats_config['config']['inputs']['path'] | dirname }}"
+    state: directory
+  when: beats_config['config']['inputs']['path'] is defined
 
-- name: Enable filebeat modules
-  command: "{{ beats_linux_exec }} modules enable {{
-                      beat_filebeat_modules | join(' ') }}"
-  when: ansible_os_family != 'Windows'
+- name: "{{ beats_flavor }}: Create modules directory"
+  file:
+    path: "{{ beats_config['config']['modules']['path'] | dirname }}"
+    state: directory
+  when: beats_config['config']['modules']['path'] is defined
 
-- name: Enable filebeat modules
-  win_command: "{{ beats_win_exec }} modules enable {{
-                        beat_filebeat_modules | join(' ') }}"
-  when: ansible_os_family == 'Windows'
+- name: "{{ beats_flavor }}: Enable filebeat modules"
+  block:
+    - name: "{{ beats_flavor }}: Enable filebeat modules on Linux"
+      command: "{{ beats_linux_exec }} modules enable {{ beats_filebeat_modules | join(' ') }}"
+      when: ansible_os_family != 'Windows'
+
+    - name: "{{ beats_flavor }}: Enable filebeat modules on Windows"
+      win_command: "{{ beats_win_exec }} modules enable {{ beats_filebeat_modules | join(' ') }}"
+      when: ansible_os_family == 'Windows'
+  when: beats_filebeat_modules | length > 0
+
+- name: "{{ beats_flavor }}: Setup ingest pipelines for modules"
+  block:
+    - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Linux"
+      command: "{{ beats_linux_exec }} setup --index-management"
+      when: ansible_os_family != 'Windows'
+
+    - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Windows"
+      command: "{{ beats_win_exec }} setup --index-management"
+      when: ansible_os_family == 'Windows'
+  when:
+    - beats_setup_index_management | bool
+    - beats_filebeat_modules | length > 0

@@ -14,5 +14,6 @@
         arguments: /quiet
   when: beats_flavor == 'packetbeat'
 
-- win_chocolatey:
+- name: "{{ beats_flavor }}: install beat on Windows"
+  win_chocolatey:
     name: "{{ beats_flavor }}"

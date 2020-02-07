@@ -88,6 +88,7 @@ beats_output_pass: ~
 # the role to store the output user/pass in the secure keystore. They are not
 # used for any other task. When configuring your output in `beats_config`,
 # you can reference these variables using `${OUTPUT_USER}` and `${OUTPUT_PASS}`.
+# TODO add these to the beats_config array if the user has not done so
 
 beats_config: {}
 # The beats configuration. This will be combined with a default
@@ -111,8 +112,8 @@ beats_path_logs: ~
 # - in the case of windows, find a way to override the paths that the service is
 # passing to the beats executable.
 # }}}
-# Other {{{
-beats_extract_index_template: true
+# Index management {{{
+beats_extract_index_template: false
 # Whether to extract the default index template that comes with beats. This
 # template is automatically loaded to elasticsearch if the elasticsearch output
 # is configured in the beats configuration. If, however, beats does not
@@ -120,17 +121,34 @@ beats_extract_index_template: true
 # configured), then the template needs to be manually loaded. Use this variable
 # to extract the index template and download it to the ansible controller so
 # that it can be loaded into elasticsearch manually (or via an `elasticsearch`
-# ansible role, such `nkakouros.elasticsearch`). The extracted index template
+# ansible role, such as `nkakouros.elasticsearch`). The extracted index template
 # will be named `beats.7.1.1.template.json`, where `7.1.1` will be the
 # actual installed version of beats.
 
 beats_index_template_download_dir: ''
 # Where on the ansible controller the index template should be downloaded to.
 
-beats_install_kibana_dashboards: false
-# Set to true to load the kibana dashboards that come with beats. If you set
+beats_setup_index_management: false
+# Whether to manually install the index template into elasticsearch. If an
+# elasticsearch output is configured, the index template will be automatically
+# loaded to elasticsearch when the beat is started. This variable allows you to
+# import the index template manually, without even starting the beat, using the
+# setup subcommand that comes with the beats. This option also loads index
+# lifecycle policies and any ingest pipelines.
+# }}}
+# Kibana dashboards {{{
+beats_config_kibana_endpoint: false
+# Set to true to configure the kibana endpoint in the beat config. If you set
 # this variable to true, the variables below will be used. Otherwise, they are
 # ignored.
+
+beats_setup_kibana_dashboards: false
+# Whether to try to install the dashboards manually. If you configure the kibana
+# endpoint with `beats_config_kibana_endpoint`, but leave this variable to
+# false, then the beat will try to communicate with Kibana and install the
+# dashboards automatically every time it is started. If you set this to true,
+# then the role will manually run the setup command that will load the
+# dashboards to kibana.
 
 beats_kibana_host: ~
 # Address where the Kibana endpoint can be reached at.
@@ -142,19 +160,21 @@ beats_kibana_password: ~
 # The user credentials that beats should use to log into the Kibana
 # endpoint. Leave `None` if no user login is needed.
 
-beats_kibana_ssl_enabled: true
+beats_kibana_ssl_enabled: false
 # Whether to enable ssl when connecting to the Kibana endpoint.
+
 beats_kibana_ssl_ca: ~
 beats_kibana_ssl_crt: ~
 beats_kibana_ssl_key: ~
 beats_kibana_ssl_key_passphrase: ~
-# The role will by default add to `beats_config` a kibana endpoint
-# configuration based on you settings above.  The certificate files will be
-# uploaded to the beats server at the `{{ beats_certificates_dir }}
-# /kibana` directory. The username, password and key_passphrase will be added to
-# the secure keystore and you can refer to them in you `beats_config` with
-# `${KIBANA_USER}`, `${KIBANA_PASS}` and `${KIBANA_CERT_KEY_PASSPHRASE}`
-# respectively.
+# The role will by default add to `beats_config` a kibana endpoint configuration
+# based on you settings above. If you want to manually configure the kibana
+# endpoint or use the above info in your config, then here are some more
+# details. The certificate files will be uploaded to the beats server at the `{{
+# beats_certificates_dir }} /kibana` directory. The username, password and
+# key_passphrase will be added to the secure keystore and you can refer to them
+# in you `beats_config` with `${KIBANA_USER}`, `${KIBANA_PASS}` and
+# `${KIBANA_CERT_KEY_PASSPHRASE}` respectively.
 # # }}}
 # Auditbeat specifics {{{
 beats_enabled_bundled_rules: []
@@ -179,7 +199,7 @@ beats_mask_journald_audit: true
 # should save on CPU and disk space.
 # }}}
 # Filebeat specifics {{{
-beat_filebeat_modules: []
+beats_filebeat_modules: []
 # The list of default configurations for filebeat modules to enable. These
 # configurations come shipped with filebeat.
 # }}}

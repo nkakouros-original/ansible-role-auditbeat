@@ -1,6 +1,6 @@
 ---
 
-- name: Upload rules bundled with the role on Linux
+- name: "{{ beats_flavor }}: Upload rules bundled with the role on Linux"
   copy:
     src: "{{ item }}"
     dest: "{{ beats_heartbeat_monitors_path }}/"
@@ -10,7 +10,7 @@
   loop: "{{ beats_heartbeat_monitor_files }}"
   when: ansible_os_family != 'Windows'
 
-- name: Upload rules bundled with the role on Windows
+- name: "{{ beats_flavor }}: Upload rules bundled with the role on Windows"
   win_copy:
     src: "{{ item }}"
     dest: "{{ beats_heartbeat_monitors_path }}/"

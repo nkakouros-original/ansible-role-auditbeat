@@ -18,12 +18,14 @@
 
 - include_tasks: outputs/kibana.yml
   when:
-    - beats_install_kibana_dashboards | bool
+    - beats_config_kibana_endpoint | bool
     - beats_flavor != 'heartbeat'  # https://github.com/elastic/beats/pull/10294
 
 - include_tasks: outputs/keystore.yml
 
 - include_tasks: core/configure.yml
+
+- include_tasks: setup.yml
 
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
   when: (role_path + '/tasks/flavor-specific/' + beats_flavor + '.yml') is file

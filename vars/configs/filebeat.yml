@@ -16,7 +16,7 @@ _beats_default_config:
           - /var/log/*.log
     config:
       modules:
-        path: ${path.config}/modules.d/*.yml
+        path: "{{ beats_path_config }}/modules.d/*.yml"
         reload:
           enabled: false
   setup:

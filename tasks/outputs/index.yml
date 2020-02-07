@@ -1,8 +1,8 @@
 ---
 
-- name: "{{ beats_flavor }} index tasks for Linux"
+- name: "{{ beats_flavor }}: index tasks for Linux"
   block:
-    - name: Extract the beats index template on Linux
+    - name: "{{ beats_flavor }}: Extract the beats index template on Linux"
       shell: >-
         {{ beats_linux_exec }} export template > \
           /tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
@@ -10,23 +10,23 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Download the {{ beats_flavor }} index template on Linux
+    - name: "{{ beats_flavor }}: Download the index template on Linux"
       fetch:
         src: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
         dest: "{{ beats_index_template_download_dir }}"
         flat: true
   when: ansible_os_family != 'Windows'
 
-- name: "{{ beats_flavor }} index tasks for Windows"
+- name: "{{ beats_flavor }}: index tasks for Windows"
   block:
-    - name: Extract the beats index template on Windows
+    - name: "{{ beats_flavor }}: Extract the beats index template on Windows"
       win_shell: >-
         {{ beats_win_exec }} export template > C:/Users/printer/AppData/Local/Temp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
       args:
         executable: powershell
       changed_when: false
 
-    - name: Download the {{ beats_flavor }} index template on Windows
+    - name: "{{ beats_flavor }}: Download the index template on Windows"
       fetch:
         src: "C:/Users/printer/AppData/Local/Temp/{{
           beats_flavor }}.{{ beats_full_version }}.template.json"
@@ -36,13 +36,13 @@
     # On Windows, the template file is downloaded as utf-16le. This breaks
     # ansible and the `uri` module when trying to upload the template to
     # elasticsearch, eg using my other role `nkakouros.elasticsearch`.
-    - name: Check file encoding
+    - name: "{{ beats_flavor }}: Check file encoding"
       stat:
         path: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
       register: _result
       delegate_to: localhost
 
-    - name: Convert to utf8
+    - name: "{{ beats_flavor }}: Convert to utf8"
       command: >-
         iconv
           --from-code {{ _result.stat.charset }}

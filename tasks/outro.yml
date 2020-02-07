@@ -1,6 +1,6 @@
 ---
 
-- name: Set beats_certificates_dir
+- name: "{{ beats_flavor }}: Set beats_certificates_dir"
   set_fact:
     "{{ item }}": ~
   when: beats_unset_facts

@@ -1,8 +1,8 @@
 ---
 
-- name: "{{ beats_flavor }} kibana tasks for Linux"
+- name: "{{ beats_flavor }}: kibana tasks for Linux"
   block:
-    - name: Create kibana certificates folder on Linux
+    - name: "{{ beats_flavor }}: Create kibana certificates folder on Linux"
       file:
         path: "{{ beats_certificates_dir }}/kibana"
         state: directory
@@ -10,7 +10,7 @@
         group: root
         mode: 0o755
 
-    - name: Upload certificates on Linux
+    - name: "{{ beats_flavor }}: Upload certificates on Linux"
       copy:
         src: "{{ item }}"
         dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
@@ -26,14 +26,14 @@
       notify: beats restart service
   when: ansible_os_family != 'Windows'
 
-- name: "{{ beats_flavor }} kibana tasks for Windows"
+- name: "{{ beats_flavor }}: kibana tasks for Windows"
   block:
-    - name: Create kibana certificates folder on Windows
+    - name: "{{ beats_flavor }}: Create kibana certificates folder on Windows"
       win_file:
         path: "{{ beats_certificates_dir }}/kibana"
         state: directory
 
-    - name: Upload certificates on Windows
+- name: "{{ beats_flavor }}: Upload certificates on Windows"
       win_copy:
         src: "{{ item }}"
         dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
@@ -46,7 +46,7 @@
       notify: beats restart service
   when: ansible_os_family == 'Windows'
 
-- name: Add Kibana endpoint to {{ beats_flavor }} configuration
+- name: "{{ beats_flavor }}: Add Kibana endpoint to configuration"
   set_fact:
     beats_combined_config: >-
       {{
