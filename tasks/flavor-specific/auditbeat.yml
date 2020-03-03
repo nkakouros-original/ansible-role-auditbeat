@@ -10,7 +10,7 @@
         state: stopped
       when: beats_mask_journald_audit | bool
 
-- name: "{{ beats_flavor }}: Upload rules bundled with the role on Linux"
+    - name: "{{ beats_flavor }}: Upload rules bundled with the role on Linux"
       copy:
         src: "{{ item }}"
         dest: "/etc/beats/{{ beats_rules_dir }}/"
