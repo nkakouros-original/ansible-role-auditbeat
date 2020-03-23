@@ -1,0 +1,21 @@
+---
+
+# Default config coming with journalbeat 7.0
+_beats_default_config:
+  name: "{{ beats_name }}"
+  path:
+    home: "{{ beats_path_home }}"
+    config: "{{ beats_path_config }}"
+    data: "{{ beats_path_data }}"
+    logs: "{{ beats_path_logs }}"
+  journalbeat:
+    inputs:
+      - paths: []
+        seek: cursor
+  setup:
+    template:
+      settings:
+        index:
+          number_of_shards: 1
+    dashboards:
+      enabled: false

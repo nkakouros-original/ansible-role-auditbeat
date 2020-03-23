@@ -23,6 +23,8 @@
 
 - include_tasks: outputs/keystore.yml
 
+- include_tasks: processors.yml
+
 - include_tasks: core/configure.yml
 
 - include_tasks: setup.yml

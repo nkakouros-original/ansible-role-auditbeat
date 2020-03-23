@@ -176,6 +176,13 @@ beats_kibana_ssl_key_passphrase: ~
 # in you `beats_config` with `${KIBANA_USER}`, `${KIBANA_PASS}` and
 # `${KIBANA_CERT_KEY_PASSPHRASE}` respectively.
 # # }}}
+# Processors {{{
+beats_processor_scripts: []
+# A list of javascript files (.js) that you want to use with the `script`
+# processor. The files will be uploaded under `/etc/filebeat/scripts` and you
+# can reference them in `beats_config` using the relative path, e.g.
+# `scripts/my-scripts.js`.
+# }}}
 # Auditbeat specifics {{{
 beats_enabled_bundled_rules: []
 # A list of rule files that are bundled with this role and that the role should
