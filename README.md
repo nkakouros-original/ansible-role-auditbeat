@@ -1,38 +1,59 @@
-Role Name
+[![Build Status](https://travis-ci.com/nkakouros-original/ansible-role-beats.svg?branch=master)](https://travis-ci.com/nkakouros-original/ansible-role-beats)
+[![Galaxy](https://img.shields.io/badge/galaxy-nkakouros.beats-blue.svg)](https://galaxy.ansible.com/nkakouros/beats/)
+
+ansible-role-beats
 =========
 
-A brief description of the role goes here.
+Installs and configures Elastic Beats.
+
+Description
+-----------
+
+This role will in a configurable manner install and configure any of the Elastic
+Beats. Only one beat can be installed and configured at a time, but this role
+can be included multiple times, one per beat.
+
+Configuration happens via a yaml dict (`beats_config`), thus every default
+configuration performed by this role can be overridden by defining the
+appropriate keys in `beats_config`.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
-Role Variables
---------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+None
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+- Of course, an Elasticsearch server should be up and running.
+- You will need to have generated certificates for use by beats (if you
+  need to enable encrypted communications).
+
+You can use other ansible roles to perform these tasks, such as
+[nkakouros.elasticsearch](https://github.com/nkakouros-original/ansible-role-elasticsearch)
+and
+[nkakouros.easyrsa](https://github.com/nkakouros-original/ansible-role-easyrsa).
+See the example playbook.
+
+Role Variables
+--------------
+
+Look at the [defaults/main.yml](defaults/main.yml) file for this roles variables and their
+documentation.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+For an example on how to use this role, see
+[molecule/default/converge.yml](molecule/default/converge.yml).
 
 License
 -------
 
-BSD
+GPLv3
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Nikolaos Kakouros (nkak@kth.se)
+
