@@ -184,31 +184,54 @@ beats_processor_scripts: []
 # `scripts/my-scripts.js`.
 # }}}
 # Auditbeat specifics {{{
-beats_enabled_bundled_rules: []
-# A list of rule files that are bundled with this role and that the role should
-# indeed upload to beats. The list should contain the filenames of the rule
-# files you want to use. For instance, if you find the
-# `files/00-default-rules.conf` rules useful, set:
+beats_auditbeat_rule_files: []
+# A list of rule files that the role should
+# upload to the server. For instance, if you find the
+# `files/00-default-rules.conf` rules file that comes with the role useful but
+# also want to upload a custom file of yours, set:
 # ```yml
-# beats_enabled_bundled_roles:
+# beats_auditbeat_rules_dir:
 #   - 00-default-rules.conf
+#   - /path/to/your/file.conf
 # ```
-# These files will be uploaded to `beats_rules_dir`.
+# These files will be uploaded to `beats_auditbeat_rules_dir`.
 
-beats_rules_dir: /etc/beats/audit.rules.d
-# The directory where audit rule files are located. These setting is also used
-# by the role to know where it should upload the files in
-# `beats_enabled_bundled_rules`. This directory will be searched for
-# `*.conf` files.
+beats_auditbeat_rules_dir: "{{ beats_path_config }}/audit.rules.d"
+# The directory where audit rule files are located. This settings sets the
+# `beats_config.auditbeat.modules.[].audit_rule_files` option (unless you
+# overwrite the role default) and is also used by the role to know where it
+# should upload the files in `beats_auditbeat_rule_files`.
 
-beats_mask_journald_audit: true
+beats_auditbeat_mask_journald_audit: true
 # Set this to true to prevent journald from listening for audit messages. This
 # should save on CPU and disk space.
 # }}}
 # Filebeat specifics {{{
+beats_filebeat_inputs_dir: "{{ beats_path_config }}/inputs.d"
+# The directory where filebeat input configuration files are located. This
+# settings sets the `beats_config.filebeat.config.inputs.path` option (unless
+# you overwrite the role default) and is also used by the role to know where it
+# should upload the files in `beats_filebeat_inputs`.
+
+beats_filebeat_inputs: []
+# A list of files on the Ansible controller that contain filebeat input
+# definitions and that the role should upload to the remote.
+
+beats_filebeat_modules_dir: "{{ beats_path_config }}/modules.d"
+# The directory where filebeat module configuration files are located. This
+# settings sets the `beats_config.filebeat.config.modules.path` option (unless
+# you overwrite the role default) and is also used by the role to know where it
+# should upload the files in `beats_filebeat_module_files`.
+
+beats_filebeat_module_files: []
+# A list of files on the Ansible controller that contain filebeat module
+# configurations and that the role should upload to the remote. Since filebeat
+# comes with configuration files for all modules it supports, this list can be
+# used to overwrite an existing configuration. To enable a module, use the
+# `beats_filebeat_modules` variable.
+
 beats_filebeat_modules: []
-# The list of default configurations for filebeat modules to enable. These
-# configurations come shipped with filebeat.
+# The list of filebeat modules to enable.
 # }}}
 # Heartbeat specifics {{{
 beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/

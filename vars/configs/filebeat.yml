@@ -15,8 +15,10 @@ _beats_default_config:
         paths:
           - /var/log/*.log
     config:
+      inputs:
+        path: "{{ beats_filebeat_inputs_dir }}/*.yml"
       modules:
-        path: "{{ beats_path_config }}/modules.d/*.yml"
+        path: "{{ beats_filebeat_modules_dir }}/*.yml"
         reload:
           enabled: false
   setup:

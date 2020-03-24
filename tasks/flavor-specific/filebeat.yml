@@ -2,15 +2,61 @@
 
 - name: "{{ beats_flavor }}: Create inputs directory"
   file:
-    path: "{{ beats_config['config']['inputs']['path'] | dirname }}"
+    path: "{{ beats_filebeat_inputs_dir }}"
     state: directory
-  when: beats_config['config']['inputs']['path'] is defined
+
+- name: "{{ beats_flavor }}: Upload inputs"
+  block:
+    - name: "{{ beats_flavor }}: Upload inputs on Linux"
+      template:
+        src: "{{ item }}"
+        dest: >-
+          {{ beats_filebeat_inputs_dir }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_filebeat_inputs }}"
+      when: ansible_os_family != 'Windows'
+      notify: beats restart service
+
+    - name: "{{ beats_flavor }}: Upload inputs on Windows"
+      win_template:
+        src: "{{ item }}"
+        dest: >-
+          {{ beats_filebeat_inputs }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_filebeat_inputs }}"
+      when: ansible_os_family == 'Windows'
+      notify: beats restart service
 
 - name: "{{ beats_flavor }}: Create modules directory"
   file:
-    path: "{{ beats_config['config']['modules']['path'] | dirname }}"
+    path: "{{ beats_filebeat_modules_dir }}"
     state: directory
-  when: beats_config['config']['modules']['path'] is defined
+
+- name: "{{ beats_flavor }}: Upload modules"
+  block:
+    - name: "{{ beats_flavor }}: Upload modules on Linux"
+      template:
+        src: "{{ item }}"
+        dest: >-
+          {{ beats_filebeat_modules_dir }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_filebeat_module_files }}"
+      when: ansible_os_family != 'Windows'
+      notify: beats restart service
+
+    - name: "{{ beats_flavor }}: Upload modules on Windows"
+      win_template:
+        src: "{{ item }}"
+        dest: >-
+          {{ beats_filebeat_modules_dir }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_filebeat_module_files }}"
+      when: ansible_os_family == 'Windows'
+      notify: beats restart service
 
 - name: "{{ beats_flavor }}: Enable filebeat modules"
   block:
@@ -23,14 +69,15 @@
       when: ansible_os_family == 'Windows'
   when: beats_filebeat_modules | length > 0
 
+
 - name: "{{ beats_flavor }}: Setup ingest pipelines for modules"
   block:
     - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Linux"
-      command: "{{ beats_linux_exec }} setup --index-management"
+      command: "{{ beats_linux_exec }} setup --pipelines"
       when: ansible_os_family != 'Windows'
 
     - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Windows"
-      command: "{{ beats_win_exec }} setup --index-management"
+      command: "{{ beats_win_exec }} setup --pipelines"
       when: ansible_os_family == 'Windows'
   when:
     - beats_setup_index_management | bool

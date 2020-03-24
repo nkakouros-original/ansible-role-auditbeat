@@ -12,7 +12,7 @@ _beats_default_config:
     modules:
       - module: auditd
         audit_rule_files:
-          - "{{ beats_rules_dir }}/*.conf"
+          - "{{ beats_auditbeat_rules_dir }}/*.conf"
       - module: file_integrity
         paths:
           - /bin
