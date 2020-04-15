@@ -1,7 +1,7 @@
 ---
 
 - block:
-    - name: Restart systemd service
+    - name: "{{ beats_flavor }}: Restart systemd service"
       systemd:
         name: "{{ beats_flavor if beats_flavor != 'heartbeat'
                     else 'heartbeat-elastic' }}"
@@ -11,12 +11,12 @@
       listen: beats restart service
       when: ansible_os_family != 'Windows'
 
-    - name: Get service facts
+    - name: "{{ beats_flavor }}: Get service facts"
       service_facts: ~
       listen: beats restart service
       when: ansible_os_family != 'Windows'
 
-    - name: Check that beats service has started successfully
+    - name: "{{ beats_flavor }}: Check that beats service has started successfully"
       assert:
         that: "ansible_facts.services['{{
                 beats_flavor if beats_flavor != 'heartbeat'
@@ -26,7 +26,7 @@
       listen: beats restart service
       when: ansible_os_family != 'Windows'
 
-    - name: Start windows service
+    - name: "{{ beats_flavor }}: Start windows service"
       win_service:
         name: "{{ beats_flavor }}"
         state: restarted
