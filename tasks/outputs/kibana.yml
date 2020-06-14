@@ -33,7 +33,7 @@
         path: "{{ beats_certificates_dir }}/kibana"
         state: directory
 
-- name: "{{ beats_flavor }}: Upload certificates on Windows"
+    - name: "{{ beats_flavor }}: Upload certificates on Windows"
       win_copy:
         src: "{{ item }}"
         dest: "{{ beats_certificates_dir }}/{{ item | basename }}"

@@ -27,7 +27,9 @@
           }}
         owner: root
         group: root
-        mode: 0o644
+        # Setting no permissions for group and others to avoid leaking
+        # monitoring details.
+        mode: 0o600
       loop: "{{ beats_auditbeat_rule_files }}"
       when: item.src is defined
       notify: beats restart service
@@ -37,7 +39,9 @@
         dest: "{{ beats_auditbeat_rules_dir }}/{{ item.dest }}"
         owner: root
         group: root
-        mode: 0o644
+        # Setting no permissions for group and others to avoid leaking
+        # monitoring details.
+        mode: 0o600
       loop: "{{ beats_auditbeat_rule_files }}"
       when: item.src is not defined
       notify: beats restart service

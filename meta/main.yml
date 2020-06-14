@@ -17,3 +17,5 @@ galaxy_info:
     - beats
     - elastic
 dependencies: []
+collections:
+  - ansible.windows

@@ -1,0 +1,26 @@
+---
+
+# Packetbeat sets the event report time as the timestamp and not the time the
+# event started (or ended). This breaks logic that filters events based on when
+# they might have occured. This pipeline sets the timestamp to the event start
+# time for packetbeat logs. Trying to do the same thing using Packetbeat
+# processors is not possible as the `@timestamp` field is not available to the
+# `copy` processor and there is no `date` processor to set the `@timestamp`
+# field, as is the case with `filebat` and `journalbeat`.
+pipelines:
+  - description: "set-timestamp-to-event-start"
+    processors:
+      - dot_expander:
+          field: 'agent.type'
+          ignore_failure: true
+      - set:
+          field: 'event.reported_time'
+          value: "{{ @timestamp }}"
+          # if: "ctx.agent.type == 'packetbeat'"
+          ignore_failure: true
+      - date:
+          field: "event.start"
+          formats:
+            - "ISO8601"
+          if: "ctx.event?.start != null && ctx.agent.type == 'packetbeat'"
+          ignore_failure: true

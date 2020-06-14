@@ -22,8 +22,10 @@
 - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
   apt:
     name: "{{ beats_flavor if beats_flavor != 'heartbeat'
-                else 'heartbeat-elastic' }}"
+              else 'heartbeat-elastic' }}={{ beats_major_version }}.{{
+              '.*' if beats_minor_version == '*' else beats_minor_version | string + '.*'}}"
     update_cache: true
+  notify: beats restart service
 
 - name: "{{ beats_flavor }}: Disable automatic updates"
   copy:

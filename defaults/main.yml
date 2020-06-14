@@ -9,31 +9,35 @@ beats_flavor: auditbeat
 
 beats_unset_facts: true
 # Set this to true to set to None some variables that this role uses. Set it to
-# true if you want to use this role multiple times during an ansible run.
-# Such variables are set to defaults by the role, not through this defaults.yml
-# file but by using `set_fact` tasks. This is done to provide default based on
-# the OS you are using. This single defaults.yml file could have only been used
-# to provide defaults for a single OS. Since these variables are assigned
-# a value with `set_fact`, they will keep their value throughout an ansible run,
-# ie they will be exposed to the playbook. If you include this role more than
-# once, eg in a loop, in order to install more than one beat (eg both auditbeat
+# true if you want to use this role multiple times during an ansible run.  Such
+# variables are set to defaults by the role, not through this defaults.yml file
+# but by using `set_fact` tasks. This is done to provide defaults based on the
+# OS you are using. This single defaults.yml file could have only been used to
+# provide defaults for a single OS. Since these variables are assigned a value
+# with `set_fact`, they will keep their value throughout an ansible run, i.e.
+# they will be exposed to the playbook. If you include this role more than once,
+# e.g. in a loop, in order to install more than one beat (e.g. both auditbeat
 # and packetbeat), the `set_fact` tasks this role uses will be skipped since the
 # variables already have a value. This means that the second beat will be
 # installed with the settings of the first, which is wrong. Setting
 # `beats_unset_facts` to true, will unset such sensitive variables so that the
-# second beat can be configured properly.
+# second beat can be configured properly. Of course, this means that you will
+# not be able to access these variables from your playbooks anymore.
 # Installation {{{
-# The version of beats to use, eg 6, 7, etc. This is only used when
-# `beats_use_upstream_repo` is set to `true`
 beats_major_version: 7
+# The version of beats to install, eg 6, 7, etc.
 
-# Whether the beats service should be enabled at the end of the role.
+beats_minor_version: 7
+# The minor version of beats to install. Set to `*` to install the latest minor
+# version.
+
 beats_enable_service: true
+# Whether the beats service should be enabled at the end of the role.
 
+beats_disable_auto_update: false
 # Whether to exclude beats from automatic system updates. Set this to true if
 # you want to manually update the beats. This is valid only for Linux servers
-# that may have some kind of unattended update mechanism.
-beats_disable_auto_update: false
+# that may have some kind of unattended update mechanism (e.g. Ubuntu server).
 # }}}
 # Certificates {{{
 beats_certificates: ~
@@ -217,9 +221,9 @@ beats_filebeat_inputs_dir: "{{ beats_path_config }}/inputs.d"
 # The directory where filebeat input configuration files are located. This
 # settings sets the `beats_config.filebeat.config.inputs.path` option (unless
 # you overwrite the role default) and is also used by the role to know where it
-# should upload the files in `beats_filebeat_inputs`.
+# should upload the files in `beats_filebeat_input_files`.
 
-beats_filebeat_inputs: []
+beats_filebeat_input_files: []
 # A list of files on the Ansible controller that contain filebeat input
 # definitions and that the role should upload to the remote.
 
@@ -238,6 +242,12 @@ beats_filebeat_module_files: []
 
 beats_filebeat_modules: []
 # The list of filebeat modules to enable.
+
+beats_filebeat_setup_pipelines: false
+# Whether to install the ingest node pipelines into elasticsearch that come with
+# the filebeat and allow it to process the logs sent by the various filebeat
+# modules. If you do not setup pipelines, the modules will fail to insert logs
+# into elasticsearch due to the missing pipelines.
 # }}}
 # Heartbeat specifics {{{
 beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/
