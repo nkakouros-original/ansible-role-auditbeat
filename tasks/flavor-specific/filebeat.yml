@@ -68,16 +68,3 @@
       win_command: "{{ beats_win_exec }} modules enable {{ beats_filebeat_modules | join(' ') }}"
       when: ansible_os_family == 'Windows'
   when: beats_filebeat_modules | length > 0
-
-
-- name: "{{ beats_flavor }}: Setup ingest pipelines for modules"
-  block:
-    - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Linux"
-      command: "{{ beats_linux_exec }} setup --pipelines"
-      when: ansible_os_family != 'Windows'
-
-    - name: "{{ beats_flavor }}: Setup ingest pipelines for modules on Windows"
-      command: "{{ beats_win_exec }} setup --pipelines"
-      when: ansible_os_family == 'Windows'
-  when:
-    - beats_filebeat_setup_pipelines | bool

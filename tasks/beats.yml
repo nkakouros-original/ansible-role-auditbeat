@@ -27,10 +27,10 @@
 
 - include_tasks: core/configure.yml
 
-- include_tasks: setup.yml
-
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
   when: (role_path + '/tasks/flavor-specific/' + beats_flavor + '.yml') is file
+
+- include_tasks: setup.yml
 
 - meta: flush_handlers
 

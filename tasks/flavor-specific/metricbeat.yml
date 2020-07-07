@@ -1,0 +1,59 @@
+---
+
+- name: "{{ beats_flavor }}: Create modules directory"
+  file:
+    path: "{{ beats_metricbeat_modules_dir }}"
+    state: directory
+
+- name: "{{ beats_flavor }}: Upload modules on Linux"
+  block:
+    - name: "{{ beats_flavor }}: Upload module files (Linux)"
+      template:
+        src: "{{ item.src }}"
+        dest: >-
+          {{ beats_metricbeat_modules_dir }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_metricbeat_module_files }}"
+      when: item.src is defined
+      notify: beats restart service
+    - name: "{{ beats_flavor }}: Upload inline modules (Linux)"
+      copy:
+        content: "{{ item.content | to_nice_yaml(indent=2, explicit_start=True) }}"
+        dest: "{{ beats_metricbeat_modules_dir }}/{{ item.dest }}"
+      loop: "{{ beats_metricbeat_module_files }}"
+      when: item.src is not defined
+      notify: beats restart service
+  when: ansible_os_family != 'Windows'
+
+- name: "{{ beats_flavor }}: Upload modules on Windows"
+  block:
+    - name: "{{ beats_flavor }}: Upload module files (Windows)"
+      win_template:
+        src: "{{ item }}"
+        dest: >-
+          {{ beats_metricbeat_modules_dir }}/{{
+            item | basename | regex_replace('^(.*)[.]j2', '\\1')
+          }}
+      loop: "{{ beats_metricbeat_module_files }}"
+      when: item.src is defined
+      notify: beats restart service
+    - name: "{{ beats_flavor }}: Upload inline modules (Windows)"
+      win_copy:
+        content: "{{ item.content | to_nice_yaml(indent=2, explicit_start=True) }}"
+        dest: "{{ beats_metricbeat_modules_dir }}/{{ item.dest }}"
+      loop: "{{ beats_metricbeat_module_files }}"
+      when: item.src is not defined
+      notify: beats restart service
+  when: ansible_os_family == 'Windows'
+
+- name: "{{ beats_flavor }}: Enable metricbeat modules"
+  block:
+    - name: "{{ beats_flavor }}: Enable metricbeat modules on Linux"
+      command: "{{ beats_linux_exec }} modules enable {{ beats_metricbeat_modules | join(' ') }}"
+      when: ansible_os_family != 'Windows'
+
+    - name: "{{ beats_flavor }}: Enable metricbeat modules on Windows"
+      win_command: "{{ beats_win_exec }} modules enable {{ beats_metricbeat_modules | join(' ') }}"
+      when: ansible_os_family == 'Windows'
+  when: beats_metricbeat_modules | length > 0
