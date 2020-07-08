@@ -1,42 +1,47 @@
 ---
 
-- name: "{{ beats_flavor }}: Install dependencies"
-  apt:
-    name: libpcap0.8
-  when: beats_flavor == 'packetbeat'
+- name: "{{ beats_flavor }}: Install using elastic repository"
+  block:
+    - name: "{{ beats_flavor }}: Install dependencies"
+      apt:
+        name: libpcap0.8
+      when: beats_flavor == 'packetbeat'
 
-- name: "{{ beats_flavor }}: Install https apt transport"
-  apt:
-    name: apt-transport-https
+    - name: "{{ beats_flavor }}: Install https apt transport"
+      apt:
+        name: apt-transport-https
 
-- name: "{{ beats_flavor }}: Add upstream repo key"
-  apt_key:
-    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-    id: 46095ACC8548582C1A2699A9D27D666CD88E42B4
+    - name: "{{ beats_flavor }}: Add upstream repo key"
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        id: 46095ACC8548582C1A2699A9D27D666CD88E42B4
 
-- name: "{{ beats_flavor }}: Add upstream beats repository"
-  apt_repository:
-    repo: "deb https://artifacts.elastic.co/packages/{{
-            beats_major_version }}.x/apt stable main"
+    - name: "{{ beats_flavor }}: Add upstream beats repository"
+      apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/{{
+                beats_major_version }}.x/apt stable main"
 
-- name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
-  apt:
-    name: "{{ beats_flavor if beats_flavor != 'heartbeat'
-              else 'heartbeat-elastic' }}={{ beats_major_version }}.{{
-              '.*' if beats_minor_version == '*' else beats_minor_version | string + '.*'}}"
-    update_cache: true
-  notify: beats restart service
+    - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
+      apt:
+        name: "{{ beats_flavor if beats_flavor != 'heartbeat'
+                  else 'heartbeat-elastic' }}={{ beats_major_version }}.{{
+                  '.*' if beats_minor_version == '*' else beats_minor_version | string + '.*'}}"
+        update_cache: true
+      notify: beats restart service
 
-- name: "{{ beats_flavor }}: Disable automatic updates"
-  copy:
-    content: |
-      Unattended-Upgrade::Package-Blacklist {
-        "auditbeat";
-        "heartbeat";
-        "filebeat";
-        "journalbeat";
-        "metricbeat";
-        "packetbeat";
-      };
-    dest: /etc/apt/apt.conf.d/55beats-disable
-  when: beats_disable_auto_update | bool
+    - name: "{{ beats_flavor }}: Disable automatic updates"
+      copy:
+        content: |
+          Unattended-Upgrade::Package-Blacklist {
+            "auditbeat";
+            "heartbeat";
+            "filebeat";
+            "journalbeat";
+            "metricbeat";
+            "packetbeat";
+          };
+        dest: /etc/apt/apt.conf.d/55beats-disable
+      when: beats_disable_auto_update | bool
+  when: beats_flavor != 'winlogbeat'
+
+- include_tasks: linux-winlogbeat.yml

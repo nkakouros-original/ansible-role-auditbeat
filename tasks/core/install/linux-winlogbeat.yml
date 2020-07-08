@@ -1,0 +1,58 @@
+---
+
+- name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
+  block:
+    - name: "{{ beats_flavor }}: Add winehq repo keys"
+      apt_key:
+        url: "{{ item }}"
+      loop:
+        - https://dl.winehq.org/wine-builds/winehq.key
+        - https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04/Release.key
+
+    - name: "{{ beats_flavor }}: Add winehq repositories"
+      apt_repository:
+        repo: "{{ item }}"
+      loop:
+        - deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main
+        - deb http://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04 ./
+
+    - name: "{{ beats_flavor }}: Install dependencies"
+      apt:
+        name: winehq-stable
+        update_cache: true
+
+    - name: "{{ beats_flavor }}: Create wine directory"
+      command: wine cmd /k exit
+      changed_when: false
+
+    - name: "{{ beats_flavor }}: Download wevtapi.dll"
+      unarchive:
+        src: "https://wikidll.com/download/24871/wevtapi.zip"
+        dest: /root/.wine/drive_c/windows/system32/
+        remote_src: true
+
+    - name: "{{ beats_flavor }}: Create winlogbeat download url"
+      set_fact:
+        _winlogbeat_url:
+          "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{
+                  beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
+
+    - name: "{{ beats_flavor }}: Download winlogbeat"
+      unarchive:
+        src: "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{
+          beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
+        dest: "{{ beats_path_home | dirname }}"
+        remote_src: true
+
+    - name: "{{ beats_flavor }}: Create config file"
+      file:
+        path: "{{ beats_path_config }}/winlogbeat.yml"
+        state: touch
+
+    - name: "{{ beats_flavor }}: Rename winlogbeat folder"
+      copy:
+        src: "{{ beats_path_home | dirname }}/{{
+          (_winlogbeat_url | urlsplit('path') | basename | splitext)[0] }}/"
+        dest: "{{ beats_path_home }}"
+        remote_src: true
+  when: beats_flavor == 'winlogbeat'
