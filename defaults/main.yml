@@ -5,7 +5,10 @@ beats_enabled: true
 
 beats_flavor: auditbeat
 # Set this variable to the name of the beat that you want the role to install
-# and configure.
+# and configure. You can even specify `winlogbeat` for a linux system and the
+# role will use wine to run it. This is useful if you want to run `winlogbeat
+# setup` on a linux server running elasticsearch to get the winlogbeat template,
+# etc inserted).
 
 beats_unset_facts: true
 # Set this to true to set to None some variables that this role uses. Set it to
@@ -103,6 +106,14 @@ beats_config: {}
 beats_name: "{{ inventory_hostname }}"
 # The name of the beat.
 
+beats_uuid: ~
+# A custom uuid to set for the beat installation. A uuid is generated
+# automatically when the beat first runs (under `path_data`/meta.json). But, if
+# you want to install the beat in an image that you will use to spawn instances
+# from, you should override the uuid in the image for each of the spawned
+# instances. Otherwise, confusion could ensue e.g. in the Kibana Stack
+# Monitoring pages.
+
 # CURRENTLY UNSUPPORTED, DO NOT USE
 beats_path_home: ~
 beats_path_config: ~
@@ -198,13 +209,13 @@ beats_auditbeat_rule_files: []
 # `files/00-default-rules.conf` rules file that comes with the role useful but
 # also want to upload a custom file of yours, set:
 # ```yml
-# beats_auditbeat_rules_dir:
+# beats_auditbeat_rules_files:
 #   - src: 00-default-rules.conf
 #   - src: /path/to/your/file.conf
 # ```
 #
 # Alternatively, you can provide the file contents inline:
-# beats_auditbeat_rules_dir:
+# beats_auditbeat_rules_files:
 #   - content: "-a exit,always ..."
 #     dest: my-rules.conf
 # The `dest` key is the name of the file where the inline rules will be uploaded
@@ -251,9 +262,25 @@ beats_filebeat_modules: []
 beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/
 # A directory where dynamically loaded monitor config files are located.
 
-beats_heartbeat_monitor_files: []
+beats_heartbeat_monitors: []
 # A list of monitor conf files that should be uploaded to
-# `beats_heartbeat_monitor_files`.
+# `beats_heartbeat_monitor_files`. Example:
+# ```
+# beats_heartbeat_monitors:
+#   - src: local/path/to/file
+# ```
+#
+# You can also specify monitors inline:
+# ```
+# beats_heartbeat_monitors:
+#   - content:
+#       name: monitor-1
+#       type: http
+#       ...
+#     dest: monitor1.yml
+# ```
+#
+# You can also combine the two formats.
 # }}}
 # Metricbeat specifics {{{
 beats_metricbeat_modules_dir: "{{ beats_path_config }}/modules.d"

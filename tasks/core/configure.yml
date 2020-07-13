@@ -36,6 +36,15 @@
       command: "{{ beats_flavor }} test output"
       changed_when: false
       when: beats_check_output | bool
+
+    - name: "{{ beats_flavor }}: Generate uuid on Linux"
+      copy:
+        content: "{{ beat_uuid | to_json }}"
+        dest: "{{ beats_path_data }}/meta.json"
+      vars:
+        beat_uuid:
+          uuid: "{{ beats_uuid }}"
+      when: beats_uuid is not none
   when: ansible_os_family != 'Windows'
 
 - name: "{{ beats_flavor }}: configuration tasks for Windows"
@@ -63,4 +72,14 @@
       win_command: "{{ beats_flavor }} test output"
       changed_when: false
       when: beats_check_output | bool
+
+    - name: "{{ beats_flavor }}: Generate uuid on Windows"
+      win_copy:
+        content: "{{ beat_uuid | to_json }}"
+        dest: "{{ beats_path_data }}/meta.json"
+      vars:
+        beat_uuid:
+          uuid: "{{ beats_uuid }}"
+      notify: beats restart service
+      when: beats_uuid is not none
   when: ansible_os_family == 'Windows'

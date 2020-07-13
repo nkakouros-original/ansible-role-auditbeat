@@ -2,6 +2,9 @@
 
 - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
   block:
+    - name: "{{ beats_flavor }}: Enable 32bit support"
+      command: dpkg --add-architecture i386
+
     - name: "{{ beats_flavor }}: Add winehq repo keys"
       apt_key:
         url: "{{ item }}"
@@ -43,6 +46,11 @@
           beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
         dest: "{{ beats_path_home | dirname }}"
         remote_src: true
+
+    - name: "{{ beats_flavor }}: Create config dir"
+      file:
+        path: "{{ beats_path_config }}"
+        state: directory
 
     - name: "{{ beats_flavor }}: Create config file"
       file:
