@@ -77,12 +77,15 @@ beats_certificates_verification: full
 # to `none` to disable verification.
 # }}}
 # Configuration {{{
-beats_systemd_override: ~
-# Use this variable to override variables in the default systemd service file
-# for beats. Eg:
-# beats_systemd_override: |
-#   [Service]
-#   Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
+beats_path_home: ~
+beats_path_config: ~
+beats_path_data: ~
+beats_path_logs: ~
+# Use this variables to override the default paths that come with this role for
+# your OS (which are set by default to the per-OS values defined in the official
+# Beats documentation).
+# TODO: These are currently not supported on Windows. I need to find a way to
+# override the paths that the service is passing to the beats executable.
 
 beats_check_output: false
 # Check if beats can connect successfully to the configured output before
@@ -95,7 +98,6 @@ beats_output_pass: ~
 # the role to store the output user/pass in the secure keystore. They are not
 # used for any other task. When configuring your output in `beats_config`,
 # you can reference these variables using `${OUTPUT_USER}` and `${OUTPUT_PASS}`.
-# TODO add these to the beats_config array if the user has not done so
 
 beats_config: {}
 # The beats configuration. This will be combined with a default
@@ -113,19 +115,39 @@ beats_uuid: ~
 # from, you should override the uuid in the image for each of the spawned
 # instances. Otherwise, confusion could ensue e.g. in the Kibana Stack
 # Monitoring pages.
+# }}}
+# SystemD {{{
+beats_systemd_override: |
+  [Service]
+  # Clear this setting, otherwise it is additive.
+  Environment=
+  EnvironmentFile=-/etc/{{ beats_flavor }}/{{ beats_installation_name }}.env.vars
+  ExecStart=
+  ExecStart={{ beats_path_home }}/bin/{{ beats_flavor }} -environment systemd $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+# Use this variable to override variables in the default systemd service file
+# for beats. Set to none (`~`) to disable the override. The default value above
+# loads environment variables from a file that this roles creates. This file
+# will use the settings from `beats_path_*` variables as well as any variable
+# mentioned below to set logging options and paths in the above systemd file.
 
-# CURRENTLY UNSUPPORTED, DO NOT USE
-beats_path_home: ~
-beats_path_config: ~
-beats_path_data: ~
-beats_path_logs: ~
-# Use this variables to override the default paths that come with this role for
-# your OS (which are set based on the official Beats documentation).
-# These are currently not supported. To support them, the role will need:
-# - in the case of linux, have additional tasks to create systemd overrides that
-# use the paths the user has defined
-# - in the case of windows, find a way to override the paths that the service is
-# passing to the beats executable.
+beats_systemd_log_opts: ''
+# Use this to override the logging options of the beat as run by the systemd
+# service. E.g.:
+# beats_systemd_log_opts: '-e -d elasticsearch'
+
+beats_installation_name: default
+# Use this variable to differentiate among multiple installations of the same
+# beats flavor on the same machine. This name will be used to create a file with
+# the same name that will be used to store environment variables (as explained
+# above) specific only to this installation. The role will install an
+# instantiate-able service (e.g. auditbeat@.service) which you can use to manage
+# the specific installation. For example:
+#
+# `systemctl start/enabled audibeat@<installation-name>`
+#
+# When this variable is set to `default`, no extra, instantiate-able service
+# will be installed. This happens only for the installations of the beat that
+# have a different name.
 # }}}
 # Index management {{{
 beats_extract_index_template: false

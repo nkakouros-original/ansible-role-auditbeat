@@ -16,22 +16,6 @@
         # validate: beats test config --path.config %s
       notify: beats restart service
 
-    - name: "{{ beats_flavor }}: Create systemd override file directory"
-      file:
-        path: "/etc/systemd/system/{{ beats_flavor }}.service.d/"
-        state: directory
-      when: beats_systemd_override != None
-
-    - name: "{{ beats_flavor }}: Create systemd override file on Linux"
-      copy:
-        content: "{{ beats_systemd_override }}"
-        dest: "/etc/systemd/system/{{ beats_flavor }}.service.d/override.conf"
-        owner: root
-        group: root
-        mode: 0o644
-      when: beats_systemd_override != None
-      notify: beats restart service
-
     - name: "{{ beats_flavor }}: Check that the output can be reached successfully on Linux"
       command: "{{ beats_flavor }} test output"
       changed_when: false
@@ -49,6 +33,11 @@
 
 - name: "{{ beats_flavor }}: configuration tasks for Windows"
   block:
+    - name: "{{ beats_flavor }}: Create config dir on Windows"
+      win_file:
+        path: "{{ beats_path_config }}"
+        state: directory
+
     - name: "{{ beats_flavor }}: Upload configuration on Windows"
       win_copy:
         content: >-

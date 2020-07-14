@@ -44,4 +44,16 @@
       when: beats_disable_auto_update | bool
   when: beats_flavor != 'winlogbeat'
 
+# These two are needed because if the config file does not exist, running the
+# beat executable even to create the keystore will fail.
+- name: "{{ beats_flavor }}: Create config dir"
+  file:
+    path: "{{ beats_path_config }}"
+    state: directory
+
+- name: "{{ beats_flavor }}: Touch config file"
+  file:
+    path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+    state: touch
+
 - include_tasks: linux-winlogbeat.yml

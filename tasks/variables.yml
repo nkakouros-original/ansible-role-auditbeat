@@ -5,27 +5,27 @@
 - name: "{{ beats_flavor }}: Set beats_certificates_dir"
   set_fact:
     beats_certificates_dir: "{{ _beats_certificates_dir }}"
-  when: beats_certificates_dir  == None
+  when: beats_certificates_dir is none
 
 - name: "{{ beats_flavor }}: Set beats_path_home"
   set_fact:
     beats_path_home: "{{ _beats_path_home }}"
-  when: beats_path_home  == None
+  when: beats_path_home is none
 
 - name: "{{ beats_flavor }}: Set beats_path_config"
   set_fact:
     beats_path_config: "{{ _beats_path_config }}"
-  when: beats_path_config == None
+  when: beats_path_config is none
 
 - name: "{{ beats_flavor }}: Set beats_path_data"
   set_fact:
     beats_path_data: "{{ _beats_path_data }}"
-  when: beats_path_data  == None
+  when: beats_path_data is none
 
 - name: "{{ beats_flavor }}: Set beats_path_logs"
   set_fact:
     beats_path_logs: "{{ _beats_path_logs }}"
-  when: beats_path_logs  == None
+  when: beats_path_logs is none
 
 # The following 4 variables make sure that forward slashes in paths are
 # converted to backslashes. This is needed when installing on Windows and using

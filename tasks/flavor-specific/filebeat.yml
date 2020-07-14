@@ -1,9 +1,17 @@
 ---
 
 - name: "{{ beats_flavor }}: Create inputs directory"
-  file:
-    path: "{{ beats_filebeat_inputs_dir }}"
-    state: directory
+  block:
+    - name: "{{ beats_flavor }}: Create inputs directory on Linux"
+      file:
+        path: "{{ beats_filebeat_inputs_dir }}"
+        state: directory
+      when: ansible_os_family != 'Windows'
+    - name: "{{ beats_flavor }}: Create inputs directory on Windows"
+      win_file:
+        path: "{{ beats_filebeat_inputs_dir }}"
+        state: directory
+      when: ansible_os_family == 'Windows'
 
 - name: "{{ beats_flavor }}: Upload inputs"
   block:
@@ -30,9 +38,17 @@
       notify: beats restart service
 
 - name: "{{ beats_flavor }}: Create modules directory"
-  file:
-    path: "{{ beats_filebeat_modules_dir }}"
-    state: directory
+  block:
+    - name: "{{ beats_flavor }}: Create modules directory on Linux"
+      file:
+        path: "{{ beats_filebeat_modules_dir }}"
+        state: directory
+      when: ansible_os_family != 'Windows'
+    - name: "{{ beats_flavor }}: Create modules directory on Windows"
+      win_file:
+        path: "{{ beats_filebeat_modules_dir }}"
+        state: directory
+      when: ansible_os_family == 'Windows'
 
 - name: "{{ beats_flavor }}: Upload modules"
   block:

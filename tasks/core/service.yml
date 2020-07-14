@@ -1,0 +1,45 @@
+---
+
+- name: Register service name
+  set_fact:
+    beats_service_name: "{{ beats_flavor if beats_flavor != 'heartbeat'
+              else 'heartbeat-elastic' }}{{
+              '@' + beats_installation_name
+              if beats_installation_name != 'default'
+              else ''
+            }}"
+
+- name: "{{ beats_flavor }}: Upload environment variables file"
+  copy:
+    content: |
+      BEAT_CONFIG_OPTS="-c {{ beats_path_config }}/{{ beats_flavor }}.yml"
+      BEAT_LOG_OPTS="{{ beats_systemd_log_opts | d('') }}"
+      BEAT_PATH_OPTS="-path.home {{ beats_path_home }} \
+        -path.config {{ beats_path_config }} \
+        -path.data {{ beats_path_data }} \
+        -path.logs {{ beats_path_logs }}"
+    dest: "{{ beats_path_config }}/{{ beats_installation_name }}.env.vars"
+  notify: beats restart service
+
+- name: "{{ beats_flavor }}: Create systemd override file directory"
+  file:
+    path: "/etc/systemd/system/{{ beats_service_name }}.service.d/"
+    state: directory
+  when: beats_systemd_override is not none
+
+- name: "{{ beats_flavor }}: Create systemd override file on Linux"
+  copy:
+    content: "{{ beats_systemd_override }}"
+    dest: "/etc/systemd/system/{{ beats_service_name }}.service.d/{{ role_name }}.override.conf"
+    owner: root
+    group: root
+    mode: 0o644
+  when: beats_systemd_override is not none
+  notify: beats restart service
+
+- name: "{{ beats_flavor }}: Install instatiate-able service"
+  template:
+    src: beats-at.service.j2
+    dest: "/etc/systemd/system/{{ beats_flavor }}@.service"
+  when: beats_installation_name != 'default'
+  notify: beats restart service

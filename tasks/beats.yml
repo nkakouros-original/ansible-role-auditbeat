@@ -25,6 +25,9 @@
 
 - include_tasks: processors.yml
 
+- include_tasks: core/service.yml
+  when: ansible_os_family != 'Windows'
+
 - include_tasks: core/configure.yml
 
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"

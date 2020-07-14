@@ -47,16 +47,6 @@
         dest: "{{ beats_path_home | dirname }}"
         remote_src: true
 
-    - name: "{{ beats_flavor }}: Create config dir"
-      file:
-        path: "{{ beats_path_config }}"
-        state: directory
-
-    - name: "{{ beats_flavor }}: Create config file"
-      file:
-        path: "{{ beats_path_config }}/winlogbeat.yml"
-        state: touch
-
     - name: "{{ beats_flavor }}: Rename winlogbeat folder"
       copy:
         src: "{{ beats_path_home | dirname }}/{{
