@@ -23,9 +23,13 @@
 
     - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
       apt:
-        name: "{{ beats_flavor if beats_flavor != 'heartbeat'
-                  else 'heartbeat-elastic' }}={{ beats_major_version }}.{{
-                  '.*' if beats_minor_version == '*' else beats_minor_version | string + '.*'}}"
+        name: "{{ beats_flavor
+                  if beats_flavor != 'heartbeat'
+                  else 'heartbeat-elastic'
+                }}={{ beats_major_version }}.{{
+                      beats_minor_version | string }}{{
+                      '' if beats_minor_version == '*' else beats_patch_version | string
+                }}"
         update_cache: true
       notify: beats restart service
 
@@ -42,7 +46,9 @@
           };
         dest: /etc/apt/apt.conf.d/55beats-disable
       when: beats_disable_auto_update | bool
-  when: beats_flavor != 'winlogbeat'
+  when:
+    - beats_flavor != 'winlogbeat'
+    - beats_full_version is version(beats_user_version, '<')
 
 # These two are needed because if the config file does not exist, running the
 # beat executable even to create the keystore will fail.
@@ -57,3 +63,5 @@
     state: touch
 
 - include_tasks: linux-winlogbeat.yml
+  when:
+    - beats_full_version is version(beats_user_version, '<')

@@ -34,6 +34,11 @@ beats_minor_version: 7
 # The minor version of beats to install. Set to `*` to install the latest minor
 # version.
 
+beats_patch_version: 1
+# The patch version of beats to install. Set to `*` to install the latest patch
+# version. If `beats_minor_version` is set to `*`, this will be effectively
+# ignored.
+
 beats_enable_service: true
 # Whether the beats service should be enabled at the end of the role.
 

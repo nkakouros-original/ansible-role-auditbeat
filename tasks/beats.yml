@@ -4,6 +4,9 @@
 
 - include_tasks: variables.yml
 
+- include_tasks: core/version.yml
+  when: _beats_already_installed.stat.exists | bool
+
 - include_tasks: "core/install/{{ ansible_os_family }}.yml"
 
 - include_tasks: core/version.yml
