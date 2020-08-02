@@ -7,6 +7,7 @@
         content: >-
           {{
             beats_combined_config
+            | combine(beats_config, recursive=True)
             | to_nice_yaml(indent=2, explicit_start=true)
           }}
         dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
@@ -42,7 +43,9 @@
       win_copy:
         content: >-
           {{
-            beats_combined_config
+            _beats_default_config
+            | combine(beats_combined_config, recursive=True)
+            | combine(beats_config, recursive=True)
             | to_nice_yaml(indent=2, explicit_start=true)
           }}
         dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
