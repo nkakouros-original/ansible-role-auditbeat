@@ -10,14 +10,12 @@
     - beats_auditbeat_mask_journald_audit | bool
     - ansible_os_family != 'Windows'
 
-
-- name: "{{ beats_flavor }}: Create rules directory"
-  file:
-    path: "{{ beats_auditbeat_rules_dir }}"
-    state: directory
-
 - name: "{{ beats_flavor }}: Upload rule files on Linux"
   block:
+    - name: "{{ beats_flavor }}: Create rules directory (Linux)"
+      file:
+        path: "{{ beats_auditbeat_rules_dir }}"
+        state: directory
     - name: "{{ beats_flavor }}: Upload rule files (Linux)"
       template:
         src: "{{ item.src }}"
@@ -49,6 +47,10 @@
 
 - name: "{{ beats_flavor }}: Upload rule files on Windows"
   block:
+    - name: "{{ beats_flavor }}: Create rules directory (Windows)"
+      win_file:
+        path: "{{ beats_auditbeat_rules_dir }}"
+        state: directory
     - name: "{{ beats_flavor }}: Upload rule files (Windows)"
       win_template:
         src: "{{ item.src }}"
