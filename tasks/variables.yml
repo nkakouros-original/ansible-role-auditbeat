@@ -90,14 +90,18 @@
 - name: "{{ beats_flavor }}: Check if beats already installed on Linux"
   stat:
     path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
-  register: _beats_already_installed
+  register: _beats_already_installed_linux
   when: ansible_os_family != 'Windows'
 
 - name: "{{ beats_flavor }}: Check if beats already installed on Windows"
   win_stat:
     path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
-  register: _beats_already_installed
+  register: _beats_already_installed_windows
   when: ansible_os_family == 'Windows'
+
+- name: "{{ beats_flavor }}: Register variable"
+  set_fact:
+    beats_already_installed: "{{ _beats_already_installed_linux.stat.exists if _beats_already_installed_linux.stat | d(false) else _beats_already_installed_windows.stat.exists }}"
 
 - name: "{{ beats_flavor }}: Initialize variable"
   set_fact:
