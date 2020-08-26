@@ -88,7 +88,7 @@
       }} --path.logs {{ beats_path_logs_backslashes }}"
 
 - name: "{{ beats_flavor }}: Check if beats already installed"
-  stat:
+  ansible.builtin.stat:
     path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
   register: _beats_already_installed
 
