@@ -21,7 +21,8 @@
     - name: "{{ beats_flavor }}: Install beat on Windows"
       win_chocolatey:
         name: "{{ beats_flavor }}"
-        version: "{{ beats_major_version }}.{{ beats_minor_version }}"
+        version: "{{ beats_major_version }}.{{ beats_minor_version }}{{
+                      '.' + beats_patch_version if beats_minor_version != '*' }}"
         state: latest
   when:
     - beats_full_version is version(beats_user_version, '<')
