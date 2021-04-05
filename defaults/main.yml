@@ -128,7 +128,8 @@ beats_systemd_override: |
   Environment=
   EnvironmentFile=-/etc/{{ beats_flavor }}/{{ beats_installation_name }}.env.vars
   ExecStart=
-  ExecStart={{ beats_path_home }}/bin/{{ beats_flavor }} -environment systemd $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+  ExecStart={{ beats_path_home }}/bin/{{ beats_flavor
+    }} -environment systemd $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
 # Use this variable to override variables in the default systemd service file
 # for beats. Set to none (`~`) to disable the override. The default value above
 # loads environment variables from a file that this roles creates. This file

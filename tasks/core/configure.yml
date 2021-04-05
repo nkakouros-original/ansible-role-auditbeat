@@ -34,6 +34,7 @@
       copy:
         content: "{{ beat_uuid | to_json }}"
         dest: "{{ beats_path_data }}/meta.json"
+        mode: 0o644
       vars:
         beat_uuid:
           uuid: "{{ beats_uuid }}"

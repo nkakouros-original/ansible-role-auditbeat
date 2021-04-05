@@ -45,6 +45,7 @@
             "packetbeat";
           };
         dest: /etc/apt/apt.conf.d/55beats-disable
+        mode: 0o644
       when: beats_disable_auto_update | bool
   when:
     - beats_flavor != 'winlogbeat'
@@ -55,11 +56,13 @@
 - name: "{{ beats_flavor }}: Create config dir"
   file:
     path: "{{ beats_path_config }}"
+    mode: 0o755
     state: directory
 
 - name: "{{ beats_flavor }}: Touch config file"
   file:
     path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+    mode: 0o644
     state: touch
 
 - include_tasks: linux-winlogbeat.yml

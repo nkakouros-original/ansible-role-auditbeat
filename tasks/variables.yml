@@ -1,6 +1,7 @@
 ---
 
-- include_vars: "paths/{{ ansible_os_family }}.yml"
+- name: "Include OS specific variables"
+  include_vars: "paths/{{ ansible_os_family }}.yml"
 
 - name: "{{ beats_flavor }}: Set beats_certificates_dir"
   set_fact:
@@ -50,7 +51,8 @@
     beats_path_logs_backslashes: >-
       {{ beats_path_logs | regex_replace('/', '\\') }}
 
-- include_vars: "configs/{{ beats_flavor }}.yml"
+- name: "Load {{ beats_flavor }} specific variables"
+  include_vars: "configs/{{ beats_flavor }}.yml"
 
 - name: "{{ beats_flavor }}: Merge user conf with defaults"
   set_fact:
@@ -101,7 +103,9 @@
 
 - name: "{{ beats_flavor }}: Register variable"
   set_fact:
-    beats_already_installed: "{{ _beats_already_installed_linux.stat.exists if _beats_already_installed_linux.stat | d(false) else _beats_already_installed_windows.stat.exists }}"
+    beats_already_installed: "{{ _beats_already_installed_linux.stat.exists
+                                 if _beats_already_installed_linux.stat | d(false)
+                                 else _beats_already_installed_windows.stat.exists }}"
 
 - name: "{{ beats_flavor }}: Initialize variable"
   set_fact:

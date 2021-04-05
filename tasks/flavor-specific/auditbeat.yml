@@ -15,6 +15,7 @@
     - name: "{{ beats_flavor }}: Create rules directory (Linux)"
       file:
         path: "{{ beats_auditbeat_rules_dir }}"
+        mode: 0o755
         state: directory
     - name: "{{ beats_flavor }}: Upload rule files (Linux)"
       template:

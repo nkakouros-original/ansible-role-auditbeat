@@ -2,6 +2,7 @@
 
 galaxy_info:
   role_name: beats
+  namespace: nkakouros
   author: Nikolaos Kakouros
   description: Installs and configures the elastic beats
   license: GPL-3.0

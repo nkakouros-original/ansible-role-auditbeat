@@ -52,5 +52,6 @@
         src: "{{ beats_path_home | dirname }}/{{
           (_winlogbeat_url | urlsplit('path') | basename | splitext)[0] }}/"
         dest: "{{ beats_path_home }}"
+        mode: 0o644
         remote_src: true
   when: beats_flavor == 'winlogbeat'
