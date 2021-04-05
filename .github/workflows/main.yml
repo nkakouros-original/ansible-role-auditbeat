@@ -53,6 +53,6 @@ jobs:
       - name: Run molecule
         run: molecule test
         env:
-          MOLECULE_DISTRO: jrei/${{ matrix.distro.image }}
+          MOLECULE_DISTRO: ${{ matrix.distro.image }}
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
           MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
