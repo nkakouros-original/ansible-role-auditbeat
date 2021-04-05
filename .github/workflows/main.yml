@@ -25,7 +25,7 @@ jobs:
       - name: Install molecule
         run: pip3 install molecule[ansible,ansible-base,docker,lint]
 
-      - name: Run a multi-line script
+      - name: Run molecule
         run: molecule test
         env:
           IN_MOLECULE: true
