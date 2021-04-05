@@ -1,6 +1,16 @@
 ---
 
-- name: "Include OS specific variables"
+- name: "Include OS specific packages"
+  include_vars: "{{ file }}"
+  loop: "{{ query('first_found', files) }}"
+  loop_control:
+    loop_var: file
+  vars:
+    files:
+      - "{{ role_path }}/vars/packages/{{ ansible_distribution_release }}.yml"
+      - "{{ role_path }}/vars/packages/{{ ansible_os_family }}.yml"
+
+- name: "Include OS specific paths"
   include_vars: "paths/{{ ansible_os_family }}.yml"
 
 - name: "{{ beats_flavor }}: Set beats_certificates_dir"

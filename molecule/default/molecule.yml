@@ -7,26 +7,18 @@ driver:
   name: docker
 lint: |
   set -e
-  pwd
   yamllint --config-file molecule/default/yamllint.yml .
   ansible-lint .
   flake8
 platforms:
-  - name: "instance-${MOLECULE_DISTRO:-ubuntu1604}"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu1604}-ansible:latest"
-    command: ${MOLECULE_INIT_CMD-""}
+  - name: "${MOLECULE_INSTANCE_NAME:-systemd-ubuntu-18.04}"
+    image: "${MOLECULE_DISTRO:-jrei/systemd-ubuntu:18.04}"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    pid: host
-    capabilities:
-      - AUDIT_CONTROL
-      - AUDIT_READ
+    command: /lib/systemd/systemd
     privileged: true
-    pre_build_image: true
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
   options:
     vvv: true
   env:

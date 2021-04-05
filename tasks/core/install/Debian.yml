@@ -1,12 +1,15 @@
 ---
 
+- name: "{{ beats_flavor }}: Install dependencies"
+  apt:
+    name: "{{ _beats_packages['all']
+              | union(_beats_packages[beats_flavor]
+                      | default([])
+                     )
+           }}"
+
 - name: "{{ beats_flavor }}: Install using elastic repository"
   block:
-    - name: "{{ beats_flavor }}: Install dependencies"
-      apt:
-        name: libpcap0.8
-      when: beats_flavor == 'packetbeat'
-
     - name: "{{ beats_flavor }}: Install https apt transport"
       apt:
         name: apt-transport-https
@@ -15,6 +18,7 @@
       apt_key:
         url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         id: 46095ACC8548582C1A2699A9D27D666CD88E42B4
+        # validate_certs: false
 
     - name: "{{ beats_flavor }}: Add upstream beats repository"
       apt_repository:
@@ -65,6 +69,7 @@
     mode: 0o644
     state: touch
 
-- include_tasks: linux-winlogbeat.yml
+- name: Load winlogbeat install tasks for Linux
+  include_tasks: linux-winlogbeat.yml
   when:
     - beats_full_version is version(beats_user_version, '<')
