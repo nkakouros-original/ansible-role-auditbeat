@@ -38,6 +38,7 @@
 
 - include_tasks: setup.yml
 
-- meta: flush_handlers
+- name: Run pending handlers now
+  meta: flush_handlers
 
 - include_tasks: outro.yml

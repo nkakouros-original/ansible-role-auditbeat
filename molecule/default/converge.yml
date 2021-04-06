@@ -1,9 +1,25 @@
 ---
+
 - name: Converge
   hosts: all
   vars:
     beats_mask_journald_audit: false
     beats_config:
+      auditbeat:
+        modules:
+          - module: auditd
+            enabled: false
+          - module: file_integrity
+            enabled: false
+          - module: system
+            enabled: true
+            datasets:
+              - host
+              - login
+              - package
+              - process
+              - socket
+              - user
       output:
         console:
           pretty: true
@@ -12,9 +28,4 @@
       include_role:
         name: ansible-role-beats
       vars:
-        beats_flavor: "{{ item }}"
-      loop:
-        - packetbeat
-        - filebeat
-        - auditbeat
-        # - winlogbeat
+        beats_flavor: "{{ lookup('env', 'MOLECULE_BEATS_FLAVOR') | default('auditbeat', true) }}"

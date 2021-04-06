@@ -1,7 +1,32 @@
 ---
 
+- name: Load supported systems
+  include_vars:
+    file: "{{ role_path }}/meta/main.yml"
+    name: _beats_role_meta
+
 - name: "{{ beats_flavor }}: Check OS is supported"
   assert:
     that:
-      - "ansible_os_family in ['Debian', 'Windows']"
-    msg: "{{ ansible_os_family }} is not supported"
+      - >-
+          ansible_distribution in _beats_role_meta.galaxy_info.platforms
+                                  | map(attribute='name') | list
+      - >-
+          ansible_distribution_version | float in _beats_role_meta.galaxy_info.platforms
+                                                  | map(attribute='versions')
+                                                  | list | flatten
+    msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not supported"
+  when:
+    # All Windows versions are marked as supported in meta/main.yml.
+    - ansible_os_family != 'Windows'
+    - beats_check_supported_platform | bool
+
+- name: "{{ beats_flavor }}: Check beat is supported on OS"
+  assert:
+    that:
+      - "beats_flavor != 'winlogbeat'"
+    msg: "{{ beats_flavor }} cannot be installed on {{ ansible_distribution }} on {{
+            ansible_distribution_version }} due to missing Wine dependencies"
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_distribution_version == '9'

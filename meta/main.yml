@@ -2,6 +2,7 @@
 
 galaxy_info:
   role_name: beats
+  namespace: nkakouros
   author: Nikolaos Kakouros
   description: Installs and configures the elastic beats
   license: GPL-3.0
@@ -9,8 +10,16 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - xenial
-        - bionic
+        - 16.04
+        - 18.04
+        - 20.04
+    - name: Debian
+      versions:
+        - 9
+        - 10
+  # - name: Windows
+  #   versions:
+  #     - all
   galaxy_tags:
     - auditbeat
     - packetbeat

@@ -3,6 +3,7 @@
 - name: "{{ beats_flavor }}: Create modules directory"
   file:
     path: "{{ beats_metricbeat_modules_dir }}"
+    mode: 0o755
     state: directory
 
 - name: "{{ beats_flavor }}: Upload modules on Linux"
@@ -14,6 +15,7 @@
           {{ beats_metricbeat_modules_dir }}/{{
             item | basename | regex_replace('^(.*)[.]j2', '\\1')
           }}
+        mode: 0o644
       loop: "{{ beats_metricbeat_module_files }}"
       when: item.src is defined
       notify: beats restart service
@@ -21,6 +23,7 @@
       copy:
         content: "{{ item.content | to_nice_yaml(indent=2, explicit_start=True) }}"
         dest: "{{ beats_metricbeat_modules_dir }}/{{ item.dest }}"
+        mode: 0o644
       loop: "{{ beats_metricbeat_module_files }}"
       when: item.src is not defined
       notify: beats restart service

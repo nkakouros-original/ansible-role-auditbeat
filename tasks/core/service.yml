@@ -19,11 +19,13 @@
         -path.data {{ beats_path_data }} \
         -path.logs {{ beats_path_logs }}"
     dest: "{{ beats_path_config }}/{{ beats_installation_name }}.env.vars"
+    mode: 0o644
   notify: beats restart service
 
 - name: "{{ beats_flavor }}: Create systemd override file directory"
   file:
     path: "/etc/systemd/system/{{ beats_service_name }}.service.d/"
+    mode: 0o755
     state: directory
   when: beats_systemd_override is not none
 
@@ -41,5 +43,6 @@
   template:
     src: beats-at.service.j2
     dest: "/etc/systemd/system/{{ beats_flavor }}@.service"
+    mode: 0o644
   when: beats_installation_name != 'default'
   notify: beats restart service

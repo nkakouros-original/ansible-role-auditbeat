@@ -1,6 +1,7 @@
 ---
 
-- block:
+- name: Linux handlers
+  block:
     - name: "{{ beats_flavor }}: Restart systemd service"
       systemd:
         name: "{{ beats_service_name }}"
@@ -8,24 +9,26 @@
         enabled: true
         daemon_reload: true
       listen: beats restart service
-      when: ansible_os_family != 'Windows'
 
     - name: "{{ beats_flavor }}: Get service facts"
       service_facts: ~
       listen: beats restart service
-      when: ansible_os_family != 'Windows'
 
     - name: "{{ beats_flavor }}: Check that beats service has started successfully"
       assert:
         that: "ansible_facts.services['{{ beats_service_name }}.service']['state'] == 'running'"
         msg: "{{ beats_service_name }}.service failed to start"
       listen: beats restart service
-      when: ansible_os_family != 'Windows'
+  when:
+    - beats_enable_service | bool
+    - ansible_os_family != 'Windows'
+    - beats_flavor != 'winlogbeat'
 
-    - name: "{{ beats_flavor }}: Start windows service"
-      win_service:
-        name: "{{ beats_flavor }}"
-        state: restarted
-      listen: beats restart service
-      when: ansible_os_family == 'Windows'
-  when: beats_enable_service | bool
+- name: "{{ beats_flavor }}: Start windows service"
+  win_service:
+    name: "{{ beats_flavor }}"
+    state: restarted
+  listen: beats restart service
+  when:
+    - beats_enable_service | bool
+    - ansible_os_family == 'Windows'

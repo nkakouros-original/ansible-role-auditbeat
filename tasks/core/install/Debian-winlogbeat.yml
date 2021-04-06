@@ -2,8 +2,14 @@
 
 - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
   block:
+    - name: "{{ beats_flavor }}: List enabled dpkg architectures"
+      command: dpkg --print-foreign-architectures
+      changed_when: false
+      register: _beats_dpkg_foreign_architectures
+
     - name: "{{ beats_flavor }}: Enable 32bit support"
       command: dpkg --add-architecture i386
+      when: "'i386' not in _beats_dpkg_foreign_architectures.stdout_lines"
 
     - name: "{{ beats_flavor }}: Add winehq repo keys"
       apt_key:
@@ -16,13 +22,17 @@
       apt_repository:
         repo: "{{ item }}"
       loop:
-        - deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main
-        - deb http://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04 ./
+        - "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ ansible_distribution_release }} main"
+        - "deb http://download.opensuse.org/repositories/Emulators:/Wine:/{{
+             ansible_os_family }}/x{{ ansible_distribution }}_{{ ansible_distribution_version }} ./"
 
     - name: "{{ beats_flavor }}: Install dependencies"
       apt:
-        name: winehq-stable
+        name: "{{ packages }}"
         update_cache: true
+      vars:
+        packages:
+          - winehq-stable
 
     - name: "{{ beats_flavor }}: Create wine directory"
       command: wine cmd /k exit
@@ -52,5 +62,6 @@
         src: "{{ beats_path_home | dirname }}/{{
           (_winlogbeat_url | urlsplit('path') | basename | splitext)[0] }}/"
         dest: "{{ beats_path_home }}"
+        mode: 0o644
         remote_src: true
   when: beats_flavor == 'winlogbeat'
