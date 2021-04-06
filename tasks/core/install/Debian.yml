@@ -8,12 +8,12 @@
                      )
            }}"
 
+- name: "{{ beats_flavor }}: Install https apt transport"
+  apt:
+    name: apt-transport-https
+
 - name: "{{ beats_flavor }}: Install using elastic repository"
   block:
-    - name: "{{ beats_flavor }}: Install https apt transport"
-      apt:
-        name: apt-transport-https
-
     - name: "{{ beats_flavor }}: Add upstream repo key"
       apt_key:
         url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
@@ -37,6 +37,7 @@
         update_cache: true
       notify: beats restart service
 
+    # TODO blacklist only the current beat
     - name: "{{ beats_flavor }}: Disable automatic updates"
       copy:
         content: |
@@ -77,6 +78,6 @@
         or _beats_config_file_exists.stat.mode != "0644"
 
 - name: Load winlogbeat install tasks for Linux
-  include_tasks: linux-winlogbeat.yml
+  include_tasks: "{{ ansible_os_family }}-winlogbeat.yml"
   when:
     - beats_full_version is version(beats_user_version, '<')
