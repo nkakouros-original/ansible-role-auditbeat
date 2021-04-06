@@ -1,5 +1,5 @@
 [![Galaxy](https://img.shields.io/badge/galaxy-nkakouros.beats-blue.svg)](https://galaxy.ansible.com/nkakouros/beats/)
-[![Github Actions](https://github.com/github/docs/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/nkakouros-original/ansible-role-beats/actions/workflows/main.yml)
+[![Github Actions](https://github.com/nkakouros-original/ansible-role-beats/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/nkakouros-original/ansible-role-beats/actions/workflows/main.yml)
 
 ansible-role-beats
 =========
