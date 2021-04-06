@@ -2,8 +2,14 @@
 
 - name: "{{ beats_flavor }}: Install {{ beats_flavor }}"
   block:
+    - name: "{{ beats_flavor }}: List enabled dpkg architectures"
+      command: dpkg --print-foreign-architectures
+      changed_when: false
+      register: _beats_dpkg_foreign_architectures
+
     - name: "{{ beats_flavor }}: Enable 32bit support"
       command: dpkg --add-architecture i386
+      when: "'i386' not in _beats_dpkg_foreign_architectures.stdout_lines"
 
     - name: "{{ beats_flavor }}: Add winehq repo keys"
       apt_key:

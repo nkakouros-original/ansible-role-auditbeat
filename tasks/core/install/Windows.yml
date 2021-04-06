@@ -24,5 +24,10 @@
         version: "{{ beats_major_version }}.{{ beats_minor_version }}{{
                       '.' + beats_patch_version | string if beats_minor_version != '*' }}"
         state: latest
+
+    - name: "{{ beats_flavor }}: Create config dir on Windows"
+      win_file:
+        path: "{{ beats_path_config }}"
+        state: directory
   when:
     - beats_full_version is version(beats_user_version, '<')

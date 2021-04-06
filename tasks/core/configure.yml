@@ -43,11 +43,6 @@
 
 - name: "{{ beats_flavor }}: configuration tasks for Windows"
   block:
-    - name: "{{ beats_flavor }}: Create config dir on Windows"
-      win_file:
-        path: "{{ beats_path_config }}"
-        state: directory
-
     - name: "{{ beats_flavor }}: Upload configuration on Windows"
       win_copy:
         content: >-

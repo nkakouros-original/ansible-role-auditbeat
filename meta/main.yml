@@ -17,9 +17,9 @@ galaxy_info:
       versions:
         - 9
         - 10
-    - name: Windows
-      versions:
-        - all
+  # - name: Windows
+  #   versions:
+  #     - all
   galaxy_tags:
     - auditbeat
     - packetbeat
