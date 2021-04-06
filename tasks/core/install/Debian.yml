@@ -63,11 +63,18 @@
     mode: 0o755
     state: directory
 
+- name: "{{ beats_flavor }}: Check if config file exists"
+  stat:
+    path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+  register: _beats_config_file_exists
+
 - name: "{{ beats_flavor }}: Touch config file"
   file:
     path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
     mode: 0o644
     state: touch
+  when: not _beats_config_file_exists.stat.exists | bool
+        or _beats_config_file_exists.stat.mode != "0644"
 
 - name: Load winlogbeat install tasks for Linux
   include_tasks: linux-winlogbeat.yml
