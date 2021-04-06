@@ -78,6 +78,6 @@
         or _beats_config_file_exists.stat.mode != "0644"
 
 - name: Load winlogbeat install tasks for Linux
-  include_tasks: "{{ ansible_os_family }}-winlogbeat.yml"
+  include_tasks: "Debian-winlogbeat.yml"
   when:
     - beats_full_version is version(beats_user_version, '<')

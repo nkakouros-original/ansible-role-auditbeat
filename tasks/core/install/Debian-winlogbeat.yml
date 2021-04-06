@@ -16,13 +16,17 @@
       apt_repository:
         repo: "{{ item }}"
       loop:
-        - deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main
-        - deb http://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04 ./
+        - "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ ansible_distribution_release }} main"
+        - "deb http://download.opensuse.org/repositories/Emulators:/Wine:/{{
+             ansible_os_family }}/x{{ ansible_distribution }}_{{ ansible_distribution_version }} ./"
 
     - name: "{{ beats_flavor }}: Install dependencies"
       apt:
-        name: winehq-stable
+        name: "{{ packages }}"
         update_cache: true
+      vars:
+        packages:
+          - winehq-stable
 
     - name: "{{ beats_flavor }}: Create wine directory"
       command: wine cmd /k exit

@@ -6,3 +6,5 @@ _beats_packages:
     - ca-certificates
   packetbeat:
     - libpcap0.8
+  winlogbeat:
+    - unzip

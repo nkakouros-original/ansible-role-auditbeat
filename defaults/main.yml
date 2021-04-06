@@ -46,6 +46,11 @@ beats_disable_auto_update: false
 # Whether to exclude beats from automatic system updates. Set this to true if
 # you want to manually update the beats. This is valid only for Linux servers
 # that may have some kind of unattended update mechanism (e.g. Ubuntu server).
+
+beats_check_supported_platform: true
+# Set to false to force the role to (try to) install on unsupported platforms.
+# This is meant to be used for newer versions of the supported operating systems
+# that the role has not caught up yet with.
 # }}}
 # Certificates {{{
 beats_certificates: ~
