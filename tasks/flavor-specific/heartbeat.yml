@@ -4,7 +4,7 @@
   block:
     - name: "{{ beats_flavor }}: Upload monitor files on Linux"
       copy:
-        src: "{{ _beats__monitor }}"
+        src: "{{ _beats__monitor.src }}"
         dest: "{{ beats_heartbeat_monitors_path }}/"
         owner: root
         group: root
