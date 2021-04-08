@@ -4,7 +4,24 @@
 
 - name: Verify
   hosts: all
+  vars:
+    role_path: ../../
+  vars_files:
+    - "{{ role_path }}/defaults/main.yml"
+    - converge-vars.yml
+  pre_tasks:
+    - import_tasks: "{{ role_path }}/tasks/variables.yml"
   tasks:
     - name: Check http monitoring is on
       wait_for:
         port: 5067
+
+    - name: Check filebeat modules are enabled
+      stat:
+        path: "{{ beats_filebeat_modules_dir }}/{{ _beats__filebeat_module }}.yml"
+      loop: "{{ beats_filebeat_modules }}"
+      loop_control:
+        loop_var: _beats__filebeat_module
+      when: beats_flavor == 'filebeat'
+      register: _result
+      failed_when: not _result.stat.exists | bool

@@ -11,7 +11,9 @@
       - "{{ role_path }}/vars/packages/{{ ansible_os_family }}.yml"
 
 - name: "Include OS specific paths"
-  include_vars: "paths/{{ ansible_os_family }}.yml"
+  include_vars: "{{ role_path }}/vars/paths/{{ ansible_os_family }}.yml"
+  # Using the absolute path because I source this file from the molecule tests
+  # and a relative path would fail.
 
 - name: "{{ beats_flavor }}: Set beats_certificates_dir"
   set_fact:
@@ -62,7 +64,9 @@
       {{ beats_path_logs | regex_replace('/', '\\') }}
 
 - name: "Load {{ beats_flavor }} specific variables"
-  include_vars: "configs/{{ beats_flavor }}.yml"
+  include_vars: "{{ role_path }}/vars/configs/{{ beats_flavor }}.yml"
+  # Using the absolute path because I source this file from the molecule tests
+  # and a relative path would fail.
 
 - name: "{{ beats_flavor }}: Merge user conf with defaults"
   set_fact:

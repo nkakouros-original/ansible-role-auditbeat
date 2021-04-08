@@ -27,7 +27,4 @@ provisioner:
 scenario:
   name: default
 verifier:
-  name: testinfra
-  enabled: false
-  lint:
-    name: flake8
+  name: ansible
