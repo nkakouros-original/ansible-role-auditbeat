@@ -42,7 +42,10 @@
 - name: "{{ beats_flavor }}: Install instatiate-able service"
   template:
     src: beats-at.service.j2
-    dest: "/etc/systemd/system/{{ beats_flavor }}@.service"
+    dest: "/etc/systemd/system/{{ beats_flavor
+                                    if beats_flavor != 'heartbeat'
+                                    else 'heartbeat-elastic'
+                               }}@.service"
     mode: 0o644
   when: beats_installation_name != 'default'
   notify: beats-restart-service
