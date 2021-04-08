@@ -30,6 +30,7 @@ jobs:
           # creating the issue.
           AUTO_P: false
           REPO: ${{ github.repository }}
-          BEFORE: ${{ github.event.before }}
+          # BEFORE: ${{ github.event.before }}
+          BEFORE: 54fde129cc7f11a18688c4c1fbb22a2aeeda80d2
           SHA: ${{ github.sha }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
