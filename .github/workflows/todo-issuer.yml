@@ -24,8 +24,6 @@ jobs:
       - name: TODO to Issue
         uses: alstr/todo-to-issue-action@v3.0.1-beta
         with:
-          # The label that will be used to identify TODO comments (deprecated)
-          LABEL: todo-in-code
           # Optional input that specifies whether to attempt to close an issue when a TODO is removed
           CLOSE_ISSUES: true
           # For multiline TODOs, format each line as a new paragraph when creating the issue
