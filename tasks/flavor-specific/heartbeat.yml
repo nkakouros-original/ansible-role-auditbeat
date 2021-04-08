@@ -32,7 +32,7 @@
   block:
     - name: "{{ beats_flavor }}: Upload monitor files on Windows"
       win_copy:
-        src: "{{ _beats__monitor }}"
+        src: "{{ _beats__monitor.src }}"
         dest: "{{ beats_heartbeat_monitors_path }}/"
       loop: "{{ beats_heartbeat_monitors }}"
       loop_control:

@@ -13,7 +13,7 @@
         src: "{{ _beats__module_file.src }}"
         dest: >-
           {{ beats_metricbeat_modules_dir }}/{{
-            _beats__module_file | basename | regex_replace('^(.*)[.]j2', '\\1')
+            _beats__module_file.src | basename | regex_replace('^(.*)[.]j2', '\\1')
           }}
         mode: 0o644
       loop: "{{ beats_metricbeat_module_files }}"
@@ -39,10 +39,10 @@
   block:
     - name: "{{ beats_flavor }}: Upload module files (Windows)"
       win_template:
-        src: "{{ _beats__module_file }}"
+        src: "{{ _beats__module_file.src }}"
         dest: >-
           {{ beats_metricbeat_modules_dir }}/{{
-            _beats__module_file | basename | regex_replace('^(.*)[.]j2', '\\1')
+            _beats__module_file.src | basename | regex_replace('^(.*)[.]j2', '\\1')
           }}
       loop: "{{ beats_metricbeat_module_files }}"
       loop_control:
