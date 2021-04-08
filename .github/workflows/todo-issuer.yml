@@ -29,3 +29,4 @@ jobs:
           # For multiline TODOs, format each line as a new paragraph when
           # creating the issue.
           AUTO_P: false
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
