@@ -13,18 +13,22 @@
 
     - name: "{{ beats_flavor }}: Add winehq repo keys"
       apt_key:
-        url: "{{ item }}"
+        url: "{{ _beats__url }}"
       loop:
         - https://dl.winehq.org/wine-builds/winehq.key
         - https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04/Release.key
+      loop_control:
+        loop_var: _beats__url
 
     - name: "{{ beats_flavor }}: Add winehq repositories"
       apt_repository:
-        repo: "{{ item }}"
+        repo: "{{ _beats__url }}"
       loop:
         - "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ ansible_distribution_release }} main"
         - "deb http://download.opensuse.org/repositories/Emulators:/Wine:/{{
              ansible_os_family }}/x{{ ansible_distribution }}_{{ ansible_distribution_version }} ./"
+      loop_control:
+        loop_var: _beats__url
 
     - name: "{{ beats_flavor }}: Install dependencies"
       apt:

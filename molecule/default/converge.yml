@@ -1,11 +1,42 @@
 ---
 
+# TODO add test case to update keystore
+# TODO enable full certificate verification
+# TODO add test for custom beats_path_*
+# TODO enable beats_check_output
+# TODO configure a kibana endpoint
+# TODO add winlogbeat tests
+
 - name: Converge
   hosts: all
+  roles:
+    - ansible-role-beats
   vars:
-    beats_mask_journald_audit: false
+    beats_flavor: "{{ lookup('env', 'MOLECULE_BEATS_FLAVOR') | default('auditbeat', true) }}"
+    beats_unset_facts: true
+
+    # Installation
+    beats_major_version: 7
+    beats_minor_version: '*'
+    beats_patch_version: '*'
+    beats_enable_service: true
+    beats_disable_auto_update: true
+    beats_check_supported_platform: true
+
+    # Certificates
+    beats_certificates:
+      ca: "~/pki/ca.crt"
+      crt: "~/pki/issued/beats.crt"
+      key: "~/pki/private/beats.key"
+    beats_certificates_password: 'nk}$Q%];a3Gy$E!QvT8E'
+    beats_keystore_update: false
+    beats_certificates_verification: 'none'
+
+    # Configuration
+    beats_check_output: false
+    beats_uuid: "{{ inventory_hostname | to_uuid }}"
     beats_config:
-      auditbeat:
+      auditbeat:  # ignored by other beats
         modules:
           - module: auditd
             enabled: false
@@ -23,9 +54,93 @@
       output:
         console:
           pretty: true
-  tasks:
-    - name: Run the role
-      include_role:
-        name: ansible-role-beats
-      vars:
-        beats_flavor: "{{ lookup('env', 'MOLECULE_BEATS_FLAVOR') | default('auditbeat', true) }}"
+      setup:
+        # ilm:
+        #   overwrite: false
+        #   check_exists: false
+        #   enabled: true
+        #   rollover_alias: "{{ beats_flavor }}-%{[agent.version]}"
+        #   pattern: "{now/d}-000001"
+        template:
+          enabled: false
+      monitoring:
+        # internal collection that pushes the data, disabled (`http` setting
+        # down below configures a better method: pull monitoring)
+        enabled: false
+        cluster_uuid:  # yet, this is needed even if `enabled: false` above
+          "{{ 'cluster_name' | to_uuid }}"
+      http:
+        enabled: true
+        host: 0.0.0.0
+        port: 5067
+
+    # SystemD
+    beats_systemd_log_opts: '-e -d elasticsearch'
+    beats_installation_name: molecule
+
+    # Index management
+    beats_extract_index_template: true
+    beats_setup_index_management: "{{ beats_check_output }}"
+    beats_setup_pipelines: "{{ beats_check_output }}"
+
+    # Kibana dashboards
+    beats_config_kibana_endpoint: false
+    beats_setup_kibana_dashboards: "{{ beats_config_kibana_endpoint }}"
+
+    # Processors
+    beats_processor_scripts:
+      - "{{ role_path }}/molecule/default/fixtures/script-processor.js"
+
+    # Auditbeat specifics
+    beats_mask_journald_audit: false
+    beats_auditbeat_rule_files:
+      - src: 00-default-rules.conf
+      - src: "{{ role_path }}/molecule/default/fixtures/auditbeat.rules.conf"
+      - dest: my-rules.conf
+        content: >-
+          -a exit,always
+          -F arch=b64
+          -S stat,lstat,fstat
+          -F path=/root
+          -F euid=root
+          -k molecule
+
+    # Filebeat specifics
+    beats_filebeat_input_files:
+      - "{{ role_path }}/molecule/default/fixtures/filebeat.inputs.yml"
+    beats_filebeat_module_files:
+      - "{{ role_path }}/molecule/default/fixtures/filebeat.module.yml"
+    beats_filebeat_modules:
+      - filebeat  # the custom module I upload via `beats_filebeat_module_files`
+      - iptables  # a module that ships with filebeat and is disabled by default
+
+    # Heartbeat specifics
+    beats_heartbeat_monitors:
+      - src: "{{ role_path }}/molecule/default/fixtures/heartbeat.monitors.yml"
+      - dest: my-custom-monitor.yml
+        content:
+          name: My custom monitor
+          id: my-custom-monitor
+          type: icmp
+          enabled: true
+          schedule: '@every 5s'
+          hosts:
+            - 127.0.0.2
+
+    # Metricbeat specifics
+    beats_metricbeat_module_files:
+      - src: "{{ role_path }}/molecule/default/fixtures/metricbeat.module.yml"
+      - dest: my-custom-module.yml
+        content:
+          - hosts: localhost:5060  # no service running there, metricbeat will report nothing
+            metricsets:
+              - stats
+              - state
+            module: beat
+            period: 5s
+            service:
+              name: service-down
+            tags:
+              - down-service
+            xpack:
+              enabled: true

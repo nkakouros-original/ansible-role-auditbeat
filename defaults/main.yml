@@ -67,7 +67,7 @@ beats_certificates_dir: ~
 # The folder where `beats_certificates` will be uploaded into. If you leave this
 # empty, the folder depends on the OS you are using and is defined in the
 # `vars/paths/YOUR_OS_FAMILY_HERE.yml` file that comes with this role (via the
-# `_beats_certificates_dir` file).
+# `_beats_certificates_dir` variable).
 
 beats_certificates_password: ''
 # The password used to protect the generated private keys. Leave empty if the
@@ -121,10 +121,12 @@ beats_name: "{{ inventory_hostname }}"
 beats_uuid: ~
 # A custom uuid to set for the beat installation. A uuid is generated
 # automatically when the beat first runs (under `path_data`/meta.json). But, if
-# you want to install the beat in an image that you will use to spawn instances
-# from, you should override the uuid in the image for each of the spawned
-# instances. Otherwise, confusion could ensue e.g. in the Kibana Stack
-# Monitoring pages.
+# you want to install the beat in an image that you will later use to spawn
+# several instances from, you should override the uuid in the image for each of
+# the spawned instances so that they don't all have the same uuid. Otherwise,
+# confusion could ensue e.g.  in the Kibana Stack Monitoring pages, where
+# traffic from these instances will be considered as originating from a single
+# instance.
 # }}}
 # SystemD {{{
 beats_systemd_override: |
@@ -173,7 +175,7 @@ beats_extract_index_template: false
 # will be named `beats.7.1.1.template.json`, where `7.1.1` will be the
 # actual installed version of beats.
 
-beats_index_template_download_dir: ''
+beats_index_template_download_dir: "{{ lookup('env', 'PWD') }}/"
 # Where on the ansible controller the index template should be downloaded to.
 
 beats_setup_index_management: false
@@ -231,9 +233,10 @@ beats_kibana_ssl_key_passphrase: ~
 # Processors {{{
 beats_processor_scripts: []
 # A list of javascript files (.js) that you want to use with the `script`
-# processor. The files will be uploaded under `/etc/filebeat/scripts` and you
-# can reference them in `beats_config` using the relative path, e.g.
-# `scripts/my-scripts.js`.
+# processor. The files will be uploaded under `/etc/{{ beats_flavor }}/scripts`
+# and you can reference them in `beats_config` using the relative path, e.g.
+# `scripts/my-scripts.js`. Not all beats support this processor, check the docs
+# to see if it meaningful to use this variable with the beat of your choice.
 # }}}
 # Auditbeat specifics {{{
 beats_auditbeat_rule_files: []
@@ -285,8 +288,12 @@ beats_filebeat_module_files: []
 # A list of files on the Ansible controller that contain filebeat module
 # configurations and that the role should upload to the remote. Since filebeat
 # comes with configuration files for all modules it supports, this list can be
-# used to overwrite an existing configuration. The module will be enabled by
-# default unless the source file has a `.disabled` suffix.
+# used to overwrite an existing configuration. The module will be disabled by
+# if the source file has a `.disabled` suffix (e.g.
+# `path/to/my-custom-module.yml.disabled`) and enabled if it ends in `.yml`. You
+# don't need to specify it in the `beats_filebeat_modules` variable in the
+# second case since it will already be enabled (but it is a good idea to do so
+# for consistency).
 
 beats_filebeat_modules: []
 # The list of filebeat modules to enable.

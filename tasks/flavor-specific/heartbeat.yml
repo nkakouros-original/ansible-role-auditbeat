@@ -4,46 +4,47 @@
   block:
     - name: "{{ beats_flavor }}: Upload monitor files on Linux"
       copy:
-        src: "{{ monitor }}"
+        src: "{{ _beats__monitor }}"
         dest: "{{ beats_heartbeat_monitors_path }}/"
         owner: root
         group: root
         mode: 0o644
       loop: "{{ beats_heartbeat_monitors }}"
       loop_control:
-        loop_var: monitor
-      when: monitor.src is defined
+        loop_var: _beats__monitor
+      when: _beats__monitor.src is defined
 
     - name: "{{ beats_flavor }}: Upload inline monitors on Linux"
       copy:
-        content: "{{ monitor.content | to_nice_yaml(indent=2, explicit_start=true) }}"
-        dest: "{{ beats_heartbeat_monitors_path }}/{{ monitor.dest }}"
+        content: "{{ _beats__monitor.content | to_nice_yaml(indent=2, explicit_start=true) }}"
+        dest: "{{ beats_heartbeat_monitors_path }}/{{ _beats__monitor.dest }}"
         owner: root
         group: root
         mode: 0o644
       loop: "{{ beats_heartbeat_monitors }}"
       loop_control:
-        loop_var: monitor
-      when: monitor.src is not defined
+        loop_var: _beats__monitor
+      when: _beats__monitor.src is not defined
   when: ansible_os_family != 'Windows'
+
 
 - name: "{{ beats_flavor }}: Upload monitors on Windows"
   block:
     - name: "{{ beats_flavor }}: Upload monitor files on Windows"
       win_copy:
-        src: "{{ monitor }}"
+        src: "{{ _beats__monitor }}"
         dest: "{{ beats_heartbeat_monitors_path }}/"
       loop: "{{ beats_heartbeat_monitors }}"
       loop_control:
-        loop_var: monitor
-      when: monitor.src is defined
+        loop_var: _beats__monitor
+      when: _beats__monitor.src is defined
 
     - name: "{{ beats_flavor }}: Upload inline monitors on Windows"
       win_copy:
-        content: "{{ monitor.content }}"
-        dest: "{{ beats_heartbeat_monitors_path }}/{{ monitor.dest }}"
+        content: "{{ _beats__monitor.content }}"
+        dest: "{{ beats_heartbeat_monitors_path }}/{{ _beats__monitor.dest }}"
       loop: "{{ beats_heartbeat_monitors }}"
       loop_control:
-        loop_var: monitor
-      when: monitor.src is notd efined
+        loop_var: _beats__monitor
+      when: _beats__monitor.src is not defined
   when: ansible_os_family == 'Windows'

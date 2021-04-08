@@ -12,12 +12,14 @@
 
     - name: "{{ beats_flavor }}: Upload certificates on Linux"
       copy:
-        src: "{{ item.value }}"
-        dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
+        src: "{{ _beats__ssl_file.value }}"
+        dest: "{{ beats_certificates_dir }}/{{ _beats__ssl_file.value | basename }}"
         owner: root
-        mode: "{{ '0o400' if item.key == 'key' else '0o644' }}"
-      loop: "{{ beats_certificates| dict2items }}"
-      notify: beats restart service
+        mode: "{{ '0o400' if _beats__ssl_file.key == 'key' else '0o644' }}"
+      loop: "{{ beats_certificates | dict2items }}"
+      loop_control:
+        loop_var: _beats__ssl_file
+      notify: beats-restart-service
   when: ansible_os_family != 'Windows'
 
 - name: "{{ beats_flavor }}: certificates tasks for Windows"
@@ -29,10 +31,12 @@
 
     - name: "{{ beats_flavor }}: Upload certificates on Windows"
       win_copy:
-        src: "{{ item.value }}"
-        dest: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
-      loop: "{{ beats_certificates| dict2items }}"
-      notify: beats restart service
+        src: "{{ _beats__ssl_file.value }}"
+        dest: "{{ beats_certificates_dir }}/{{ _beats__ssl_file.value | basename }}"
+      loop: "{{ beats_certificates | dict2items }}"
+      loop_control:
+        loop_var: _beats__ssl_file
+      notify: beats-restart-service
   when: ansible_os_family == 'Windows'
 
 - name: "{{ beats_flavor }}: Add certificates configuration"

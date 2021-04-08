@@ -11,10 +11,12 @@
 
 - name: Upload scripts for the script processor
   copy:
-    src: "{{ item }}"
+    src: "{{ _beats__script }}"
     dest: "{{ beats_path_config }}/scripts/"
     owner: root
     group: root
     mode: 0o644
   loop: "{{ beats_processor_scripts }}"
-  notify: beats restart service
+  loop_control:
+    loop_var: _beats__script
+  notify: beats-restart-service

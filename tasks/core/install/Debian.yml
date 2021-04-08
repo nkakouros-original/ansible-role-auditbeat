@@ -35,7 +35,7 @@
                       '' if beats_minor_version == '*' else '.' + beats_patch_version | string
                 }}"
         update_cache: true
-      notify: beats restart service
+      notify: beats-restart-service
 
     # TODO blacklist only the current beat
     - name: "{{ beats_flavor }}: Disable automatic updates"

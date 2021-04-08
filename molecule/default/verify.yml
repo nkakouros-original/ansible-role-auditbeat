@@ -1,0 +1,10 @@
+---
+
+# TODO add more tests here
+
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check http monitoring is on
+      wait_for:
+        port: 5067

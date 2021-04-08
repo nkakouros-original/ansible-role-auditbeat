@@ -2,19 +2,20 @@
 
 dependency:
   name: galaxy
-  enabled: false
 driver:
   name: docker
 lint: |
   set -e
   yamllint --config-file molecule/default/yamllint.yml .
-  ansible-lint .
+  ansible-lint -c molecule/default/ansible-lint.yml .
   flake8
 platforms:
   - name: "${MOLECULE_INSTANCE_NAME:-systemd-ubuntu-18.04}"
     image: "${MOLECULE_DISTRO:-jrei/systemd-ubuntu:18.04}"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - '5067:5067/tcp'
     command: /lib/systemd/systemd
     privileged: true
 provisioner:

@@ -12,18 +12,20 @@
 
     - name: "{{ beats_flavor }}: Upload certificates on Linux"
       copy:
-        src: "{{ item }}"
-        dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
+        src: "{{ _beats__ssl_file }}"
+        dest: "{{ beats_certificates_dir }}/{{ _beats__ssl_file | basename }}"
         owner: root
         group: root
         mode: 0o644
       when:
-        - item != None
+        - _beats__ssl_file != None
+      loop_control:
+        loop_var: _beats__ssl_file
       loop:
         - "{{ beats_kibana_ssl_ca }}"
         - "{{ beats_kibana_ssl_crt }}"
         - "{{ beats_kibana_ssl_key }}"
-      notify: beats restart service
+      notify: beats-restart-service
   when: ansible_os_family != 'Windows'
 
 - name: "{{ beats_flavor }}: kibana tasks for Windows"
@@ -35,15 +37,17 @@
 
     - name: "{{ beats_flavor }}: Upload certificates on Windows"
       win_copy:
-        src: "{{ item }}"
-        dest: "{{ beats_certificates_dir }}/{{ item | basename }}"
+        src: "{{ _beats__ssl_file }}"
+        dest: "{{ beats_certificates_dir }}/{{ _beats__ssl_file | basename }}"
       when:
-        - item != None
+        - _beats__ssl_file != None
+      loop_control:
+        loop_var: _beats__ssl_file
       loop:
         - "{{ beats_kibana_ssl_ca }}"
         - "{{ beats_kibana_ssl_crt }}"
         - "{{ beats_kibana_ssl_key }}"
-      notify: beats restart service
+      notify: beats-restart-service
   when: ansible_os_family == 'Windows'
 
 - name: "{{ beats_flavor }}: Add Kibana endpoint to configuration"

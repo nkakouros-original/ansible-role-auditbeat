@@ -1,10 +1,10 @@
 ---
 
 - name: "Include OS specific packages"
-  include_vars: "{{ file }}"
+  include_vars: "{{ _beats__file }}"
   loop: "{{ query('first_found', files) }}"
   loop_control:
-    loop_var: file
+    loop_var: _beats__file
   vars:
     files:
       - "{{ role_path }}/vars/packages/{{ ansible_distribution_release }}.yml"

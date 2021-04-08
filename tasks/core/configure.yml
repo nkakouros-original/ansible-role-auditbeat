@@ -23,7 +23,7 @@
         group: root
         mode: 0o644
         # validate: beats test config --path.config %s
-      notify: beats restart service
+      notify: beats-restart-service
 
     - name: "{{ beats_flavor }}: Check that the output can be reached successfully on Linux"
       command: "{{ beats_flavor }} test output"
@@ -52,7 +52,7 @@
           }}
         dest: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
         # validate: beats test config --path.config %s
-      notify: beats restart service
+      notify: beats-restart-service
 
     - name: "{{ beats_flavor }}: Check that the output can be reached successfully on Windows"
       win_command: "{{ beats_flavor }} test output"
@@ -66,6 +66,6 @@
       vars:
         beat_uuid:
           uuid: "{{ beats_uuid }}"
-      notify: beats restart service
+      notify: beats-restart-service
       when: beats_uuid is not none
   when: ansible_os_family == 'Windows'
