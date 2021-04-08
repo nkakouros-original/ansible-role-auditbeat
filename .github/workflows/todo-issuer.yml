@@ -29,4 +29,7 @@ jobs:
           # For multiline TODOs, format each line as a new paragraph when
           # creating the issue.
           AUTO_P: false
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
