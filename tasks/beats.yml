@@ -13,9 +13,6 @@
 
 - include_tasks: core/keystore.yml
 
-- include_tasks: outputs/index.yml
-  when: beats_extract_index_template | bool
-
 - include_tasks: outputs/certificates.yml
   when: beats_certificates != None
 
@@ -35,6 +32,11 @@
 
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
   when: (role_path + '/tasks/flavor-specific/' + beats_flavor + '.yml') is file
+
+# This should run after the flavor specific tasks, because these tasks may add
+# monitors, etc that will cause new fields to be exported to the index template.
+- include_tasks: outputs/index.yml
+  when: beats_extract_index_template | bool
 
 - include_tasks: setup.yml
 
