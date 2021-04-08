@@ -111,7 +111,7 @@
     beats_filebeat_module_files:
       - "{{ role_path }}/molecule/default/fixtures/filebeat.module.yml"
     beats_filebeat_modules:
-      - filebeat  # the custom module I upload via `beats_filebeat_module_files`
+      - filebeat.module  # the custom module I upload via `beats_filebeat_module_files`
       - iptables  # a module that ships with filebeat and is disabled by default
 
     # Heartbeat specifics
