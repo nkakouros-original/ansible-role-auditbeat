@@ -15,6 +15,7 @@
     - name: Check http monitoring is on
       wait_for:
         port: 5067
+      when: beats_flavor != 'winlogbeat'
 
     - name: Check filebeat modules are enabled
       stat:
