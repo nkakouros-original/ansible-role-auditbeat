@@ -94,8 +94,9 @@ beats_path_logs: ~
 # Use this variables to override the default paths that come with this role for
 # your OS (which are set by default to the per-OS values defined in the official
 # Beats documentation).
-# TODO: These are currently not supported on Windows. I need to find a way to
-# override the paths that the service is passing to the beats executable.
+# TODO: These are currently not properly supported on Windows. I need to find
+# a way to override the paths that the service is passing to the beats
+# executable.
 
 beats_check_output: false
 # Check if beats can connect successfully to the configured output before
@@ -109,14 +110,8 @@ beats_output_pass: ~
 # used for any other task. When configuring your output in `beats_config`,
 # you can reference these variables using `${OUTPUT_USER}` and `${OUTPUT_PASS}`.
 
-beats_config: {}
-# The beats configuration. This will be combined with a default
-# configuration that comes with this role. The variables below are used by the
-# default configuration and are meant as a convenience. You can ignore them and
-# set the relevant settings in `beats_config` directly.
-
-beats_name: "{{ inventory_hostname }}"
-# The name of the beat.
+beats_config: "{{ _beats_flavor_specific_default_config }}"
+# The beats configuration.
 
 beats_uuid: ~
 # A custom uuid to set for the beat installation. A uuid is generated
@@ -192,9 +187,12 @@ beats_setup_pipelines: false
 # # }}}
 # Kibana dashboards {{{
 beats_config_kibana_endpoint: false
-# Set to true to configure the kibana endpoint in the beat config. If you set
-# this variable to true, the variables below will be used. Otherwise, they are
-# ignored.
+# Set to true to configure the kibana endpoint. Doing so will add the required
+# directives in `beats_config` automatically, using the variables below. Set
+# this variable to false if you want to manually configure the kibana endpoint
+# in `beats_config` and ignore the variables below (if you do that, note that
+# the role will not upload or otherwise handle ssl certificates for the kibana
+# endpoint and you will have to take care of them yourself).
 
 beats_setup_kibana_dashboards: false
 # Whether to try to install the dashboards manually. If you configure the kibana
@@ -206,6 +204,7 @@ beats_setup_kibana_dashboards: false
 
 beats_kibana_host: ~
 # Address where the Kibana endpoint can be reached at.
+
 beats_kibana_path: ~
 # HTTP path prefix to prepend to http api calls
 

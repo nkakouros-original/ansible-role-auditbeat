@@ -51,13 +51,13 @@
     - name: "{{ beats_flavor }}: Create winlogbeat download url"
       set_fact:
         _winlogbeat_url:
+          # TODO Winlogbeat download url does not support wildcards for minor/patch versions
           "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{
                   beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
 
     - name: "{{ beats_flavor }}: Download winlogbeat"
       unarchive:
-        src: "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{
-          beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
+        src: "{{ _winlogbeat_url }}"
         dest: "{{ beats_path_home | dirname }}"
         remote_src: true
 

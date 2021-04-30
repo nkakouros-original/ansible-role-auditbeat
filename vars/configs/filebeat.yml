@@ -1,13 +1,7 @@
 ---
 
 # Default config coming with filebeat 7.0
-_beats_default_config:
-  name: "{{ beats_name }}"
-  path:
-    home: "{{ beats_path_home }}"
-    config: "{{ beats_path_config }}"
-    data: "{{ beats_path_data }}"
-    logs: "{{ beats_path_logs }}"
+_beats_flavor_specific_default_config:
   filebeat:
     inputs:
       - type: log
@@ -21,10 +15,3 @@ _beats_default_config:
         path: "{{ beats_filebeat_modules_dir }}/*.yml"
         reload:
           enabled: false
-  setup:
-    template:
-      settings:
-        index:
-          number_of_shards: 1
-    dashboards:
-      enabled: false

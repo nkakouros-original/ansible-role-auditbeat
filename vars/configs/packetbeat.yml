@@ -1,13 +1,7 @@
 ---
 
 # Default config coming with auditbeat 7.0
-_beats_default_config:
-  name: "{{ beats_name }}"
-  path:
-    home: "{{ beats_path_home }}"
-    config: "{{ beats_path_config }}"
-    data: "{{ beats_path_data }}"
-    logs: "{{ beats_path_logs }}"
+_beats_flavor_specific_default_config:
   packetbeat:
     interfaces:
       device: any
@@ -50,7 +44,3 @@ _beats_default_config:
           - 8443
           - 8883
           - 9243
-  setup:
-    template:
-      settings:
-        index.number_of_shards: 1
