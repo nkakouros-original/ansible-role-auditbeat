@@ -181,6 +181,20 @@ beats_setup_index_management: false
 # setup subcommand that comes with the beats. This option also loads index
 # lifecycle policies and any ingest pipelines.
 
+beats_setup_template_field_overrides: []
+# A list of replacement patters for the `blockinfile` module that will be used
+# to change settings for the default fields that come with the beat. For
+# instance, if you want to change packetbeat's `url.full` field to have a longer
+# maximum length than 1024 bytes (as of version 7.12), you can use:
+# beats_setup_template_fields:
+# - marker_begin: "        The `#` is not part of the fragment.'"
+#   marker_end: '      multi_fields:'
+#   block: |2
+#         - name: full
+#           level: extended
+#           type: keyword
+#           ignore_above: 8192
+
 beats_setup_pipelines: false
 # Whether to install the ingest node pipelines into elasticsearch that come with
 # the beat and allow elasticsearch to process the logs sent by the beat.

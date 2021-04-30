@@ -30,6 +30,8 @@
 
 - include_tasks: core/configure.yml
 
+- include_tasks: core/fields.yml
+
 - include_tasks: "flavor-specific/{{ beats_flavor }}.yml"
   when: (role_path + '/tasks/flavor-specific/' + beats_flavor + '.yml') is file
 
