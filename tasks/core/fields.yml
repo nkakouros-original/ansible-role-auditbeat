@@ -1,6 +1,5 @@
 ---
 
-- debug: var=beats_setup_template_field_overrides
 - name: "{{ beats_flavor }}: Override field settings"
   blockinfile:
     path: "{{ beats_combined_config.setup.template.fields
