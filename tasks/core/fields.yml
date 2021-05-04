@@ -2,8 +2,7 @@
 
 - name: "{{ beats_flavor }}: Override field settings"
   blockinfile:
-    path: "{{ beats_combined_config.setup.template.fields
-              | d(beats_path_config + '/fields.yml') }}"
+    path: "{{ beats_path_config + '/fields.yml' }}"
     marker_begin: "{{ _beats__field_setting.marker_begin }}"
     marker_end: "{{ _beats__field_setting.marker_end }}"
     marker: "{mark}"
