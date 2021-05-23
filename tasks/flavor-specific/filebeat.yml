@@ -25,7 +25,7 @@
           {{ beats_filebeat_inputs_dir }}/{{
             _beats__input_file | basename | regex_replace('^(.*)[.]j2', '\\1')
           }}
-        mode: 0o644
+        mode: 0o600
       loop: "{{ beats_filebeat_input_files }}"
       loop_control:
         loop_var: _beats__input_file
