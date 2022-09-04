@@ -309,7 +309,10 @@ beats_filebeat_module_files: []
 # for consistency).
 
 beats_filebeat_modules: []
-# The list of filebeat modules to enable.
+# List of filebeat modules to enable.
+
+beats_filebeat_modules_disable: []
+# List of filebeat modules to disable.
 # }}}
 # Heartbeat specifics {{{
 beats_heartbeat_monitors_path: /etc/heartbeat/monitors.d/
