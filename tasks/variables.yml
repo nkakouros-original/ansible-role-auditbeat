@@ -8,8 +8,9 @@
     loop_var: _beats__file
   vars:
     files:
-      - "{{ role_path }}/vars/packages/{{ ansible_distribution_release }}.yml"
+      - "{{ role_path }}/vars/packages/{{ ansible_distribution_release | d('') }}.yml"
       - "{{ role_path }}/vars/packages/{{ ansible_os_family }}.yml"
+      - "{{ role_path }}/vars/main.yml"  # fallback
 # }}}
 # Paths {{{
 - name: "{{ beats_flavor }}: Load default paths"

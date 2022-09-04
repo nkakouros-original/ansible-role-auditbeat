@@ -53,7 +53,8 @@
         _winlogbeat_url:
           # TODO Winlogbeat download url does not support wildcards for minor/patch versions
           "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{
-                  beats_major_version }}.{{ beats_minor_version }}.0-windows-x86_64.zip"
+                  beats_major_version }}.{{ beats_minor_version }}.{{
+                    beats_patch_version }}-windows-x86_64.zip"
 
     - name: "{{ beats_flavor }}: Download winlogbeat"
       unarchive:
@@ -67,5 +68,11 @@
           (_winlogbeat_url | urlsplit('path') | basename | splitext)[0] }}/"
         dest: "{{ beats_path_home }}"
         mode: 0o644
+        remote_src: true
+
+    - name: Copy fields.yml next to config file
+      copy:
+        src: "{{ beats_path_home }}/fields.yml"
+        dest: "{{ beats_path_config }}"
         remote_src: true
   when: beats_flavor == 'winlogbeat'

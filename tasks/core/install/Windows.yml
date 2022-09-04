@@ -18,12 +18,22 @@
             arguments: /quiet
       when: beats_flavor == 'packetbeat'
 
+    - name: "{{ beats_flavor }}: Stop windows service"
+      win_service:
+        name: "{{ beats_flavor }}"
+        state: stopped
+
+    - win_file:
+        path: "C:\\ProgramData\\chocolatey\\lib\\{{ beats_flavor }}"
+        state: absent
+
     - name: "{{ beats_flavor }}: Install beat on Windows"
       win_chocolatey:
         name: "{{ beats_flavor }}"
         version: "{{ beats_major_version }}.{{ beats_minor_version }}{{
                       '.' + beats_patch_version | string if beats_minor_version != '*' }}"
         state: latest
+        force: true
 
     - name: "{{ beats_flavor }}: Create config dir on Windows"
       win_file:

@@ -11,3 +11,5 @@
   loop: "{{ beats_setup_template_field_overrides }}"
   loop_control:
     loop_var: _beats__field_setting
+  when: ansible_os_family != 'Windows'
+  # TODO there is no win_blockinfile module, find a workaround for windows
