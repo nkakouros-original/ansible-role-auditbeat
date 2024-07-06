@@ -1,5 +1,4 @@
 ---
-
 dependency:
   name: galaxy
 driver:
@@ -10,16 +9,25 @@ lint: |
   ansible-lint -c molecule/default/ansible-lint.yml .
   flake8
 platforms:
-  - name: "${MOLECULE_INSTANCE_NAME:-systemd-ubuntu-18.04}"
-    image: "${MOLECULE_DISTRO:-jrei/systemd-ubuntu:18.04}"
+  - name: "${MOLECULE_INSTANCE_NAME:-systemd-ubuntu-20.04}"
+    image: "${MOLECULE_DISTRO:-jrei/systemd-ubuntu:20.04}"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     published_ports:
       - '5067:5067/tcp'
     command: /lib/systemd/systemd
     privileged: true
+    pre_build_image: true
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      duplicate_dict_key: error
+      any_unparsed_is_failed: true
+      unparsed_is_failed: true
+      any_errors_fatal: true
+      remote_tmp: /tmp
+      local_tmp: /tmp
   options:
     vvv: true
   env:

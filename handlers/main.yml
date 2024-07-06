@@ -16,7 +16,7 @@
 
     - name: "{{ beats_flavor }}: Check that beats service has started successfully"
       assert:
-        that: "ansible_facts.services['{{ beats_service_name }}.service']['state'] == 'running'"
+        that: "ansible_facts.services[beats_service_name + '.service']['state'] == 'running'"
         msg: "{{ beats_service_name }}.service failed to start"
       listen: beats-restart-service
   when:

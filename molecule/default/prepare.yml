@@ -6,6 +6,12 @@
   pre_tasks:
     - name: Install python
       raw: apt update; apt install -y python3
+    - name: Install sudo
+      raw: apt install -y sudo
+    - name: Ensure /etc/easyrsa/pki directory exists
+      file:
+        path: /etc/easyrsa/pki
+        state: directory
   vars:
     easyrsa_servers:
       - name: elastic
@@ -25,4 +31,4 @@
 
     easyrsa_download: []
     easyrsa_download_pki: true
-    easyrsa_download_dir: '~/'
+    easyrsa_download_dir: '~'
