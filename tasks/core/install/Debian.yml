@@ -54,7 +54,6 @@
       when: beats_disable_auto_update | bool
   when:
     - beats_flavor != 'winlogbeat'
-    - beats_full_version is version(beats_user_version, '<')
 
 # These two are needed because if the config file does not exist, running the
 # beat executable even to create the keystore will fail.
@@ -79,5 +78,3 @@
 
 - name: Load winlogbeat install tasks for Linux
   include_tasks: "Debian-winlogbeat.yml"
-  when:
-    - beats_full_version is version(beats_user_version, '<')
