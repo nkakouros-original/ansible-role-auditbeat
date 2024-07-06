@@ -1,16 +1,22 @@
 ---
 
-# TODO add more tests here
-
 - name: Verify
   hosts: all
   vars:
     role_path: ../../
+    beats_service_name: "{{ beats_flavor if beats_flavor != 'heartbeat'
+              else 'heartbeat-elastic' }}{{
+              '@' + beats_installation_name
+              if beats_installation_name != 'default'
+              else ''
+            }}"
+    role_name: ansible-role-beats
   vars_files:
     - "{{ role_path }}/defaults/main.yml"
     - converge-vars.yml
   pre_tasks:
     - import_tasks: "{{ role_path }}/tasks/variables.yml"
+    - import_tasks: "{{ role_path }}/tasks/core/version.yml"
   tasks:
     - name: Check http monitoring is on
       wait_for:
@@ -26,3 +32,193 @@
       when: beats_flavor == 'filebeat'
       register: _result
       failed_when: not _result.stat.exists | bool
+
+    - name: Tasks specific to Linux systems
+      block:
+        - name: Tasks specific to Debian systems
+          block:
+            - name: "{{ beats_flavor }}: Check if dependencies are installed"
+              command: dpkg -s {{ item }}
+              register: result
+              failed_when: "'installed' not in result.stdout"
+              loop: "{{ _beats_packages['all'] | union(_beats_packages[beats_flavor] | default([])) }}"
+
+            - name: Check that apt-transport-https is installed
+              command: dpkg -s apt-transport-https
+              register: result
+              failed_when: "'installed' not in result.stdout"
+
+            - name: Tasks excluding winlogbeat
+              block:
+                - name: Check that the Elastic repository key is added
+                  command: apt-key finger
+                  register: result
+                  failed_when: "'4609 5ACC 8548 582C 1A26  99A9 D27D 666C D88E 42B4' not in result.stdout"
+
+                - name: Check that the Elastic repository is added
+                  command: grep -r 'https://artifacts.elastic.co/packages/' /etc/apt/sources.list.d/
+                  register: result
+                  failed_when: "'https://artifacts.elastic.co/packages/' not in result.stdout"
+
+                - name: Check that {{ beats_flavor }} is installed
+                  command: dpkg -s {{ beats_flavor if beats_flavor != 'heartbeat' else 'heartbeat-elastic' }}
+                  register: result
+                  failed_when: "'installed' not in result.stdout"
+
+                - name: Check that automatic updates are disabled for {{ beats_flavor }}
+                  command: cat /etc/apt/apt.conf.d/55beats-disable
+                  register: result
+                  failed_when: beats_flavor not in result.stdout
+              when: beats_flavor != 'winlogbeat'
+          when: ansible_os_family == 'Debian'
+
+        - name: Check that the certificates directory exists
+          stat:
+            path: "{{ beats_certificates_dir }}"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isdir
+
+        - name: Check that the certificates are uploaded
+          stat:
+            path: "{{ beats_certificates_dir }}/{{ item.value | basename }}"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg
+          loop: "{{ beats_certificates | dict2items }}"
+          loop_control:
+            loop_var: item
+
+        - name: Check that the environment variables file exists and has correct permissions
+          stat:
+            path: "{{ beats_path_config }}/{{ beats_installation_name }}.env.vars"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0644'
+
+        - name: Check that the systemd override file directory exists and has correct permissions
+          stat:
+            path: "/etc/systemd/system/{{ beats_service_name }}.service.d/"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isdir or result.stat.mode != '0755'
+          when: beats_systemd_override is not none
+
+        - name: Check that the systemd override file exists and has correct permissions
+          stat:
+            path: "/etc/systemd/system/{{ beats_service_name }}.service.d/{{ role_name }}.override.conf"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0644' or result.stat.gr_name != 'root' or result.stat.pw_name != 'root'
+          when: beats_systemd_override is not none
+
+        - name: Check that the instatiate-able service file exists and has correct permissions
+          stat:
+            path: "/etc/systemd/system/{{ beats_flavor if beats_flavor != 'heartbeat' else 'heartbeat-elastic' }}@.service"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0644'
+          when: beats_installation_name != 'default'
+        
+
+        - name: Check that the configuration file is present with correct permissions
+          stat:
+            path: "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+          register: config_file_stat
+          failed_when: >
+            not config_file_stat.stat.exists or
+            not config_file_stat.stat.isreg or
+            config_file_stat.stat.mode != '0644' or
+            config_file_stat.stat.gr_name != 'root' or
+            config_file_stat.stat.pw_name != 'root'
+
+        - name: Check the content of the configuration file
+          command: cat "{{ beats_path_config }}/{{ beats_flavor }}.yml"
+          register: config_file_content
+          failed_when: >
+            config_file_content.rc != 0 or
+            beats_flavor not in config_file_content.stdout
+
+
+        - name: Check that the uuid file exists
+          stat:
+            path: "{{ beats_path_data }}/meta.json"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg
+          when: beats_uuid is not none
+
+        - name: Check that the uuid file has correct content
+          command: cat "{{ beats_path_data }}/meta.json"
+          register: result
+          failed_when: result.rc != 0 or beats_uuid not in result.stdout
+          when: beats_uuid is not none
+
+        - name: Tasks specific to auditbeat
+          block:
+            - name: Check that journald-audit is disabled
+              systemd:
+                name: systemd-journald-audit.socket
+              register: service_status
+              failed_when: service_status.status.LoadState != 'masked' or service_status.status.ActiveState != 'inactive'
+              when: beats_auditbeat_mask_journald_audit | bool
+
+            - name: Check that the rules directory exists and has correct permissions
+              stat:
+                path: "{{ beats_auditbeat_rules_dir }}"
+              register: result
+              failed_when: not result.stat.exists or not result.stat.isdir or result.stat.mode != '0755'
+            
+
+            - name: Check that the rule files are uploaded and have correct permissions
+              stat:
+                path: "{{ beats_auditbeat_rules_dir }}/{{ item.src | basename | regex_replace('^(.*)[.]j2', '\\1') }}"
+              register: result
+              failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0600' or result.stat.gr_name != 'root' or result.stat.pw_name != 'root'
+              loop: "{{ beats_auditbeat_rule_files }}"
+              loop_control:
+                loop_var: item
+              when: item.src is defined
+
+            - name: Check that the inline rules are uploaded and have correct permissions
+              stat:
+                path: "{{ beats_auditbeat_rules_dir }}/{{ item.dest }}"
+              register: result
+              failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0600' or result.stat.gr_name != 'root' or result.stat.pw_name != 'root'
+              loop: "{{ beats_auditbeat_rule_files }}"
+              loop_control:
+                loop_var: item
+              when: item.src is not defined
+
+            - name: Check that the inline rules have correct content
+              command: cat "{{ beats_auditbeat_rules_dir }}/{{ item.dest }}"
+              register: result
+              failed_when: result.rc != 0 or item.content not in result.stdout
+              loop: "{{ beats_auditbeat_rule_files }}"
+              loop_control:
+                loop_var: item
+              when: item.src is not defined
+          when: beats_flavor == 'auditbeat'
+
+        - name: Check that the index template file exists on the remote host
+          stat:
+            path: "/tmp/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg
+
+        - name: Check that the index template file has been downloaded
+          stat:
+            path: "{{ beats_index_template_download_dir }}/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json"
+          register: result
+          failed_when: not result.stat.exists or not result.stat.isreg
+
+      when: ansible_os_family != 'Windows'
+
+    - name: Check that the scripts directory exists and has correct permissions
+      stat:
+        path: "{{ beats_path_config }}/scripts/"
+      register: result
+      failed_when: not result.stat.exists or not result.stat.isdir or result.stat.mode != '0644' or result.stat.gr_name != 'root' or result.stat.pw_name != 'root'
+      when: beats_processor_scripts | length > 0
+
+    - name: Check that the scripts are uploaded and have correct permissions
+      stat:
+        path: "{{ beats_path_config }}/scripts/{{ item | basename }}"
+      register: result
+      failed_when: not result.stat.exists or not result.stat.isreg or result.stat.mode != '0644' or result.stat.gr_name != 'root' or result.stat.pw_name != 'root'
+      loop: "{{ beats_processor_scripts }}"
+      loop_control:
+        loop_var: item
