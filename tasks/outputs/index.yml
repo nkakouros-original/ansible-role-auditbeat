@@ -5,14 +5,14 @@
     - name: "{{ beats_flavor }}: Extract the beats index template on Linux"
       shell: >-
         {{ beats_linux_exec }} export template > \
-          /tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json
+          /tmp/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json
       args:
         executable: /bin/bash
       changed_when: false
 
     - name: "{{ beats_flavor }}: Download the index template on Linux"
       fetch:
-        src: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
+        src: "/tmp/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json"
         dest: "{{ beats_index_template_download_dir }}"
         flat: true
   when: ansible_os_family != 'Windows'
