@@ -1,6 +1,6 @@
 - name: Prepare
   hosts: all
-  gather_facts: true
+  gather_facts: false
   roles:
     - nkakouros.easyrsa
   pre_tasks:
@@ -12,6 +12,8 @@
       file:
         path: /etc/easyrsa/pki
         state: directory
+    - name: Gathering Facts
+      setup:
   vars:
     easyrsa_servers:
       - name: elastic
