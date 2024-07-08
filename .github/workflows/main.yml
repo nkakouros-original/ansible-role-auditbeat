@@ -15,28 +15,12 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   molecule:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 
     strategy:
       matrix:
         distro:
-          #- image: jrei/systemd-ubuntu:16.04
-          # instance: systemd-ubuntu-16.04
-          #- image: jrei/systemd-ubuntu:18.04
-          # instance: systemd-ubuntu-18.04
           - image: jrei/systemd-ubuntu:20.04
             instance: systemd-ubuntu-20.04
-            #- image: jrei/systemd-ubuntu:22.04
-            #  instance: systemd-ubuntu-22.04
-            #- image: jrei/systemd-ubuntu:24.04
-            #  instance: systemd-ubuntu-24.04
-            # - image: jrei/systemd-centos:7
-            #   instance: systemd-centos-7
-            # - image: jrei/systemd-centos:8
-            #   instance: systemd-centos-8
-            # - image: jrei/systemd-debian:9
-            #   instance: systemd-debian-9
-            # - image: jrei/systemd-debian:10
-            #   instance: systemd-debian-10
         beats_flavor:
           - auditbeat
     steps:
@@ -57,5 +41,5 @@ jobs:
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
           MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
 
-      - name: Check docker images
-        run: docker ps -a
+      - name: Check docker 
+        run: docker --version && docker ps -a
