@@ -47,10 +47,15 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: '3.12'
 
       - name: Install molecule
-        run: pip3 install molecule[ansible,ansible-base,docker,lint]
+        run: pip3 install ansible-core molecule molecule-docker
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install ansible.windows
+          ansible-galaxy collection install community.general
 
       - name: Run molecule
         run: molecule test
