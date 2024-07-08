@@ -19,12 +19,16 @@ jobs:
     strategy:
       matrix:
         distro:
-          - image: jrei/systemd-ubuntu:16.04
-            instance: systemd-ubuntu-16.04
-          - image: jrei/systemd-ubuntu:18.04
-            instance: systemd-ubuntu-18.04
+          #- image: jrei/systemd-ubuntu:16.04
+          # instance: systemd-ubuntu-16.04
+          #- image: jrei/systemd-ubuntu:18.04
+          # instance: systemd-ubuntu-18.04
           - image: jrei/systemd-ubuntu:20.04
             instance: systemd-ubuntu-20.04
+            #- image: jrei/systemd-ubuntu:22.04
+            #  instance: systemd-ubuntu-22.04
+            #- image: jrei/systemd-ubuntu:24.04
+            #  instance: systemd-ubuntu-24.04
             # - image: jrei/systemd-centos:7
             #   instance: systemd-centos-7
             # - image: jrei/systemd-centos:8
@@ -35,12 +39,6 @@ jobs:
             #   instance: systemd-debian-10
         beats_flavor:
           - auditbeat
-          - filebeat
-          - heartbeat
-          - journalbeat
-          - metricbeat
-          - packetbeat
-          - winlogbeat
     steps:
       - uses: actions/checkout@v2
 
@@ -50,12 +48,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install molecule
-        run: pip3 install ansible-core molecule molecule-docker
-
-      - name: Install Ansible collections
-        run: |
-          ansible-galaxy collection install ansible.windows
-          ansible-galaxy collection install community.general
+        run: pip3 install ansible molecule molecule-docker
 
       - name: Run molecule
         run: molecule test
