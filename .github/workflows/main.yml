@@ -50,15 +50,6 @@ jobs:
       - name: Install molecule
         run: pip3 install ansible molecule molecule-docker
 
-      - name: Pull image and run it
-        run: |
-          docker pull ${{ matrix.distro.image }}
-          docker run -d --name ${{ matrix.distro.instance }} \
-            -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-            -p 5067:5067/tcp \
-            --privileged \
-            ${{ matrix.distro.image }} /lib/systemd/systemd
-
       - name: Run molecule
         run: molecule test
         env:

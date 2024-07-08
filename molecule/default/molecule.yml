@@ -18,6 +18,7 @@ platforms:
     command: /lib/systemd/systemd
     privileged: true
     pre_build_image: true
+    user: root 
 provisioner:
   name: ansible
   config_options:
@@ -26,7 +27,7 @@ provisioner:
       any_unparsed_is_failed: true
       unparsed_is_failed: true
       any_errors_fatal: true
-      remote_tmp: /tmp/.ansible-${USER}/tmp
+      remote_tmp: /tmp/.ansible-${USER}
       local_tmp: /tmp
   options:
     vvv: true
