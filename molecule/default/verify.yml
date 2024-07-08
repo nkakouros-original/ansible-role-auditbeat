@@ -69,6 +69,7 @@
                   command: cat /etc/apt/apt.conf.d/55beats-disable
                   register: result
                   failed_when: beats_flavor not in result.stdout
+                  when: beats_disable_auto_update | bool
               when: beats_flavor != 'winlogbeat'
           when: ansible_os_family == 'Debian'
 
