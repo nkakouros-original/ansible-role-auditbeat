@@ -26,7 +26,7 @@ provisioner:
       any_unparsed_is_failed: true
       unparsed_is_failed: true
       any_errors_fatal: true
-      remote_tmp: /tmp
+      remote_tmp: /tmp/.ansible-${USER}/tmp
       local_tmp: /tmp
   options:
     vvv: true
