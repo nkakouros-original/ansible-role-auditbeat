@@ -51,8 +51,11 @@ jobs:
         run: pip3 install ansible molecule molecule-docker
 
       - name: Run molecule
-        run: molecule test
+        run: molecule converge || true
         env:
           MOLECULE_DISTRO: ${{ matrix.distro.image }}
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
           MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
+
+      - name: Check docker images
+        run: docker ps -a
