@@ -196,13 +196,13 @@
 
         - name: Check that the index template file exists on the remote host
           stat:
-            path: "/tmp/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json"
+            path: "/tmp/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
           register: result
           failed_when: not result.stat.exists or not result.stat.isreg
 
         - name: Check that the index template file has been downloaded
           stat:
-            path: "{{ beats_index_template_download_dir }}/{{ beats_flavor }}.{{ beats_full_version.split()[2] }}.template.json"
+            path: "{{ beats_index_template_download_dir }}/{{ beats_flavor }}.{{ beats_full_version }}.template.json"
           register: result
           failed_when: not result.stat.exists or not result.stat.isreg
 
