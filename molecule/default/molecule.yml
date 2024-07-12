@@ -12,13 +12,12 @@ platforms:
   - name: "${MOLECULE_INSTANCE_NAME:-systemd-ubuntu-20.04}"
     image: "${MOLECULE_DISTRO:-jrei/systemd-ubuntu:20.04}"
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     published_ports:
       - '5067:5067/tcp'
-    command: /lib/systemd/systemd
+    command: /usr/sbin/init
     privileged: true
     pre_build_image: true
-    user: root 
 provisioner:
   name: ansible
   config_options:
@@ -27,7 +26,7 @@ provisioner:
       any_unparsed_is_failed: true
       unparsed_is_failed: true
       any_errors_fatal: true
-      remote_tmp: /tmp/.ansible-${USER}
+      remote_tmp: /tmp
       local_tmp: /tmp
   options:
     vvv: true
