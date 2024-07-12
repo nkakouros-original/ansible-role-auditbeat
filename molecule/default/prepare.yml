@@ -1,6 +1,6 @@
 - name: Prepare
   hosts: all
-  gather_facts: false
+  gather_facts: true
   roles:
     - nkakouros.easyrsa
   pre_tasks:

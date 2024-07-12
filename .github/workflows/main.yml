@@ -15,7 +15,7 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   molecule:
-    runs-on: ubuntu-20.04 
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         distro:
@@ -34,28 +34,8 @@ jobs:
       - name: Install molecule
         run: pip3 install ansible molecule molecule-docker
 
-      - name: Run molecule create
-        run: molecule create
-        env:
-          MOLECULE_DISTRO: ${{ matrix.distro.image }}
-          MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
-          MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
-
-      - name: Check docker
-        run: docker --version && docker ps -a
-
-      - name: Run molecule prepare
-        run: molecule prepare
-        env:
-          MOLECULE_DISTRO: ${{ matrix.distro.image }}
-          MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
-          MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
-
-      - name: Check docker__
-        run: docker --version && docker ps -a
-
-      - name: Run molecule
-        run: molecule converge
+      - name: Run molecule test
+        run: sudo molecule test
         env:
           MOLECULE_DISTRO: ${{ matrix.distro.image }}
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
