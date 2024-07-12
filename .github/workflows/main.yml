@@ -34,8 +34,19 @@ jobs:
       - name: Install molecule
         run: sudo pip3 install ansible molecule molecule-docker
 
-      - name: Run molecule test
-        run: sudo $(which molecule) test
+      - name: Run molecule create
+        run: sudo $(which molecule) create
+        env:
+          MOLECULE_DISTRO: ${{ matrix.distro.image }}
+          MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
+          MOLECULE_BEATS_FLAVOR: ${{ matrix.beats_flavor }}
+
+      - name: Check docker
+        run: docker --version && docker ps -a
+
+
+      - name: Run molecule converge
+        run: sudo $(which molecule) converge
         env:
           MOLECULE_DISTRO: ${{ matrix.distro.image }}
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
