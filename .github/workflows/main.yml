@@ -32,7 +32,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install molecule
-        run: pip3 install ansible molecule molecule-docker
+        run: sudo pip3 install ansible molecule molecule-docker
 
       - name: Run molecule test
         run: sudo $(which molecule) test
