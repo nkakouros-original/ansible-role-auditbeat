@@ -32,10 +32,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install molecule
-        run: sudo pip3 install ansible molecule molecule-docker
+        run: pip3 install ansible molecule molecule-docker
 
       - name: Run molecule test
-        run: sudo $(which molecule) test
+        run: molecule test
         env:
           MOLECULE_DISTRO: ${{ matrix.distro.image }}
           MOLECULE_INSTANCE_NAME: ${{ matrix.distro.instance }}
