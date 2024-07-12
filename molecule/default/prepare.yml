@@ -34,3 +34,4 @@
     easyrsa_download: []
     easyrsa_download_pki: true
     easyrsa_download_dir: '~'
+    ansible_user_id: "{{ lookup('pipe', 'id -un') }}"
