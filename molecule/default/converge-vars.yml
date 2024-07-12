@@ -4,7 +4,7 @@ beats_flavor: "{{ lookup('env', 'MOLECULE_BEATS_FLAVOR') | default('auditbeat', 
 beats_unset_facts: true
 
 # Installation
-beats_major_version: 7
+beats_major_version: 8
 beats_minor_version: "{{ '*' if beats_flavor != 'winlogbeat' else '12' }}"
 beats_patch_version: "{{ '*' if beats_flavor != 'winlogbeat' else '0' }}"
 beats_enable_service: true

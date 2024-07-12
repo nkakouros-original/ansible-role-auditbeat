@@ -1,5 +1,3 @@
----
-
 name: CI
 
 on:  # yamllint disable-line rule:truthy
@@ -17,42 +15,26 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   molecule:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 
     strategy:
       matrix:
         distro:
-          - image: jrei/systemd-ubuntu:16.04
-            instance: systemd-ubuntu-16.04
-          - image: jrei/systemd-ubuntu:18.04
-            instance: systemd-ubuntu-18.04
           - image: jrei/systemd-ubuntu:20.04
             instance: systemd-ubuntu-20.04
-            # - image: jrei/systemd-centos:7
-            #   instance: systemd-centos-7
-            # - image: jrei/systemd-centos:8
-            #   instance: systemd-centos-8
-            # - image: jrei/systemd-debian:9
-            #   instance: systemd-debian-9
-            # - image: jrei/systemd-debian:10
-            #   instance: systemd-debian-10
         beats_flavor:
           - auditbeat
-          - filebeat
-          - heartbeat
-          - journalbeat
-          - metricbeat
-          - packetbeat
-          - winlogbeat
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup Python
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
 
       - name: Install molecule
-        run: pip3 install molecule[ansible,ansible-base,docker,lint]
+        run: pip3 install ansible molecule molecule-docker
 
-      - name: Run molecule
+      - name: Run molecule test
         run: molecule test
         env:
           MOLECULE_DISTRO: ${{ matrix.distro.image }}

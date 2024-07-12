@@ -1,13 +1,19 @@
----
-
 - name: Prepare
   hosts: all
-  gather_facts: false
+  gather_facts: true
   roles:
     - nkakouros.easyrsa
   pre_tasks:
     - name: Install python
       raw: apt update; apt install -y python3
+    - name: Install sudo
+      raw: apt install -y sudo
+    - name: Ensure /etc/easyrsa/pki directory exists
+      file:
+        path: /etc/easyrsa/pki
+        state: directory
+    - name: Gathering Facts
+      setup:
   vars:
     easyrsa_servers:
       - name: elastic
@@ -27,4 +33,5 @@
 
     easyrsa_download: []
     easyrsa_download_pki: true
-    easyrsa_download_dir: '~/'
+    easyrsa_download_dir: '~'
+    ansible_user_id: "{{ lookup('pipe', 'id -un') }}"

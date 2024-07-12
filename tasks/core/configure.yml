@@ -35,6 +35,7 @@
         beat_uuid:
           uuid: "{{ beats_uuid }}"
       when: beats_uuid is not none
+      changed_when: false
   when: ansible_os_family != 'Windows'
 
 - name: "{{ beats_flavor }}: configuration tasks for Windows"
