@@ -13,12 +13,11 @@
     - name: "{{ beats_flavor }}: Get service facts"
       service_facts: ~
       listen: beats-restart-service
-
-    - name: "{{ beats_flavor }}: Check that beats service has started successfully"
-      assert:
-        that: "ansible_facts.services['{{ beats_service_name }}.service']['state'] == 'running'"
-        msg: "{{ beats_service_name }}.service failed to start"
-      listen: beats-restart-service
+      register: _result
+      retries: 4
+      # No need for delay, getting the service facts is a slow task anyway.
+      failed_when:
+        - _result.ansible_facts.services[beats_service_name + '.service']['state'] != 'running'
   when:
     - beats_enable_service | bool
     - ansible_os_family != 'Windows'
