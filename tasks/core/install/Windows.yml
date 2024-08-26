@@ -26,6 +26,8 @@
     - win_file:
         path: "C:\\ProgramData\\chocolatey\\lib\\{{ beats_flavor }}"
         state: absent
+      retries: 5
+      delay: 3
 
     - name: "{{ beats_flavor }}: Install beat on Windows"
       win_chocolatey:
